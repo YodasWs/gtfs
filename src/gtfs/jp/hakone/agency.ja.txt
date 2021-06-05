@@ -1,0 +1,6 @@
+agency_id,agency_name,agency_url,agency_timezone,agency_lang,agency_fare_url
+odakyu_tozan_rail,箱根登山電車,http://www.hakone-tozan.co.jp,Asia/Tokyo,ja,
+odakyu_tozan_ropeway,,http://www.hakoneropeway.co.jp/,Asia/Tokyo,ja,
+odakyu_tozan_bus,箱根登山バス,https://www.hakone-tozanbus.co.jp,Asia/Tokyo,ja,
+odakyu_highway_bus,,http://www.odakyu-hakonehighway.co.jp/,Asia/Tokyo,ja,
+odakyu_hakone_cruise,,http://www.hakonenavi.jp/,Asia/Tokyo,ja,

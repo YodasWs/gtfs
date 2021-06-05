@@ -1,0 +1,14 @@
+route_id,agency_id,route_short_name,route_long_name,route_type,x_route_icon,route_url,route_color,route_text_color
+tozan_rail,odakyu_tozan_rail,,Hakone Tozan Train,2,9e,,FF0000,
+tozan_cable,odakyu_tozan_rail,,Hakone Tozan Cable Car,7,9e,,DEB887,
+hakone_ropeway,odakyu_tozan_ropeway,,Hakone Ropeway,5,a1,,000000,ffffff
+cruise,odakyu_hakone_cruise,,Hakone Sightseeing Cruise,4,a2,http://www.hakonenavi.jp/english/traffic/transportation/sightseeing-cruise/,fdd000,
+tozan_T,odakyu_tozan_bus,T,Togendai Line,3,8c,,165CC3,
+tozan_H,odakyu_tozan_bus,H,Hakone-machi Line,3,8c,,d8273c,
+tozan_S,odakyu_tozan_bus,S,Tourist Attraction Sightseeing Bus (via Kozuka-rindo),3,8c,,65007b,ffffff
+tozan_R,odakyu_tozan_bus,R,Hakone-shindo Line,3,8c,,a587bd,
+tozan_K,odakyu_tozan_bus,K,Hakone-kyukaido Line,3,8c,,803b00,
+tozan_Y,odakyu_tozan_bus,Y,Gora Line,3,8c,,73b5e3,
+bus_W,odakyu_highway_bus,W,Shunjuku Hakone Line,3,8c,,e3bb00,
+bus_D,odakyu_highway_bus,D,Haneda Yumoto Line,3,8c,,d3b685,
+bus_V,odakyu_highway_bus,V,Haneda Line,3,8c,,bd704a,

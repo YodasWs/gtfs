@@ -1,0 +1,4 @@
+stop_id,stop_name
+sanmaibashi,三枚橋
+sanmaibashi-east,東三枚橋
+yama-no-hotel,小田級山のホテル

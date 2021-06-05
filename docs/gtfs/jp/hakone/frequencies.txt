@@ -1,0 +1,2 @@
+trip_id,start_time,end_time,headway_secs
+tozan_T_1,8:00:00,17:00:00,900

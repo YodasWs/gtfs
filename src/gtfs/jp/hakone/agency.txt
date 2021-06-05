@@ -1,0 +1,6 @@
+agency_id,agency_name,agency_url,agency_timezone,agency_lang,agency_fare_url
+odakyu_tozan_rail,Hakone Tozan Railway,http://www.hakone-tozan.co.jp/en/,Asia/Tokyo,en,
+odakyu_tozan_ropeway,Hakone Tozan Ropeway,http://www.hakoneropeway.co.jp/foreign/en/,Asia/Tokyo,en,
+odakyu_tozan_bus,Hakone Tozan Bus,https://www.hakone-tozanbus.co.jp/english/index.html,Asia/Tokyo,en,
+odakyu_highway_bus,Hakone Highway Bus,http://www.odakyu-hakonehighway.co.jp/,Asia/Tokyo,en,
+odakyu_hakone_cruise,Hakone Sightseeing Cruise,http://www.hakonenavi.jp/english/traffic/transportation/sightseeing-cruise/,Asia/Tokyo,en,

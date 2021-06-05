@@ -1,0 +1,6 @@
+service_id,monday,tuesday,wednesday,thursday,friday,saturday,sunday,start_date,end_date
+tozan_service,1,1,1,1,1,1,1,,
+ropeway_q1,1,1,1,1,1,1,1,20160301,20160731
+ropeway_q2,1,1,1,1,1,1,1,20160801,20160831
+ropeway_q3,1,1,1,1,1,1,1,20160901,20161131
+ropeway_q4,1,1,1,1,1,1,1,20161201,20170228

@@ -478,10 +478,10 @@ function runTasks(task) {
 		name: 'transfer:assets',
 		src: [
 			'./src/**/*.jp{,e}g',
-			// './src/**/*.json',
 			'./src/**/*.gif',
 			'./src/**/*.png',
 			'./src/**/*.ttf',
+			'./src/**/*.txt',
 		],
 		tasks: [],
 	}
@@ -547,6 +547,9 @@ gulp.task('watch', (done) => {
 	gulp.watch('./src/**/*.{sa,sc,c}ss', {
 		usePolling: true,
 	}, gulp.series('compile:sass'));
+	gulp.watch('./gtfs/**/*.txt', {
+		usePolling: true,
+	}, gulp.series('transfer:assets'));
 	gulp.watch('./lib/yodasws.js', {
 		usePolling: true,
 	}, gulp.series('transfer:res'));
