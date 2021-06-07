@@ -1,0 +1,129 @@
+#google-maps {
+	min-height: 400px;
+	margin: 0;
+}
+
+comp-gtfs {
+	> section[data-route-id] {
+		transition: flex-basis 300ms, margin 300ms;
+		flex-basis: auto;
+		max-width: 300px;
+		margin: 0.5rem;
+		order: 3;
+
+		&.highlighted {
+			order: 2;
+		}
+
+		&.active {
+			margin: 0 0 0.5rem;
+			flex-basis: 25%;
+			flex-grow: 1;
+			order: 1;
+		}
+
+		li:not(:last-of-type) {
+			border-bottom: 1px solid black;
+		}
+
+		> h1,
+		> h2 {
+			text-align: center;
+			cursor: pointer;
+			margin: 0;
+		}
+
+		> h1 {
+			font-size: 1.5em;
+			padding: 2px 5px;
+		}
+
+		> h2 {
+			font-size: 1.2em;
+			padding: 0 5px 5px;
+		}
+
+		> h1 + h2 {
+			position: relative;
+			top: -1px;
+		}
+
+		> ol {
+			margin: 0;
+		}
+
+		li {
+			padding: 2px 5px;
+		}
+
+		li[data-stop-id] {
+			cursor: pointer;
+			transition: background 500ms;
+
+			&.active {
+				background: lightgreen;
+			}
+		}
+	}
+
+	> section.agency {
+		padding: 2px 1rem 1rem;
+		margin: 0.5rem;
+		order: 10;
+
+		> * {
+			display: block;
+		}
+
+		> h1 {
+			text-align: center;
+			margin: 0;
+		}
+
+		> h1:nth-of-type(n + 2) {
+			margin-top: 1rem;
+		}
+
+		> a[href] {
+			text-align: center;
+			font-size: smaller;
+		}
+	}
+
+	> small.gtfs {
+		display: none;
+		order: 100;
+		overflow: auto;
+		padding: 2px 5px;
+		max-width: 200px;
+		height: 100px;
+		font-size: 0.6em;
+
+		> p {
+			margin-top: 0;
+		}
+	}
+}
+
+@media (max-width: 600px) {
+	#google-maps.gtfs {
+		margin-right: 0;
+	}
+
+	comp-gtfs {
+		> section[data-route-id]:first-of-type,
+		> section[data-route-id].active,
+		> section[data-route-id] {
+			flex-basis: 100%;
+			max-width: none;
+			margin: 0;
+		}
+	}
+}
+
+@media (min-width: 800px) {
+	#google-maps.gtfs {
+		margin-right: 5px;
+		flex-basis: 70%;
+	}
+}

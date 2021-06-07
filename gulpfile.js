@@ -520,7 +520,7 @@ gulp.task('transfer:fonts', () => gulp.src([
 );
 
 gulp.task('transfer:res', () => gulp.src([
-	'./lib/yodasws.js',
+	'./lib/*.js',
 ])
 	.pipe(gulp.dest(path.join(options.dest, 'res'))),
 );
@@ -550,7 +550,7 @@ gulp.task('watch', (done) => {
 	gulp.watch('./gtfs/**/*.txt', {
 		usePolling: true,
 	}, gulp.series('transfer:assets'));
-	gulp.watch('./lib/yodasws.js', {
+	gulp.watch('./lib/*.js', {
 		usePolling: true,
 	}, gulp.series('transfer:res'));
 	gulp.watch('./src/**/*.{js,json}', {
@@ -610,9 +610,6 @@ gulp.task('generate:page', gulp.series(
 		`git status`,
 	]),
 ));
-
-gulp.task('init:win', () => {
-});
 
 // TODO: Let's move all of this into a separate file.
 // Here we only need to check that other file exists, run it, then maybe delete it
