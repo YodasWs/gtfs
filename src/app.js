@@ -19,6 +19,7 @@ yodasws.page('home').setRoute({
 		return;
 	}
 
+	// Start loading GTFS files
 	const gtfs = new Worker('res/gtfs.js');
 	if (!(gtfs instanceof Worker)) {
 		setTitleError();
@@ -41,10 +42,12 @@ yodasws.page('home').setRoute({
 			'jp/hakone': {
 				search: 'Hakone, Japan',
 				title: 'Hakone, Japan',
+				files: 'jp/hakone',
 			},
 			'us/charlotte': {
 				search: 'Charlotte, NC, USA',
 				title: 'Charlotte',
+				files: 'us/charlotte',
 			},
 		};
 		if (locs[loc]) {
@@ -53,12 +56,22 @@ yodasws.page('home').setRoute({
 		locs = Object.entries(locs).filter(([key, obj]) => key.includes(loc));
 		return locs[Math.floor(Math.random() * locs.length)][1];
 	})();
-
 	if (!loc) {
 		showNoGoogleError();
 		return;
 	}
 
+	gtfs.postMessage([
+		'loadGTFS',
+		loc.files,
+	]);
+
+	// Show Page to User
+	[...document.querySelectorAll('#google-maps, .gtfs')].forEach((el) => {
+		el.removeAttribute('hidden');
+	});
+
+	// Set Page Title
 	(() => {
 		const h2 = document.querySelector('main > h2');
 		if (!(h2 instanceof Element)) return;
@@ -74,7 +87,7 @@ yodasws.page('home').setRoute({
 		el.removeAttribute('hidden');
 	});
 
-	// Load Geocoder
+	// Load and Display Google Maps
 	const geocoder = new google.maps.Geocoder();
 	geocoder.geocode({ address: loc.search }, (results, status) => {
 		if (status == 'OK') {
