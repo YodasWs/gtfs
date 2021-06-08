@@ -1,3 +1,29 @@
+// Extend String.prototype.trim to PHP behavior to remove more than just white space
+String.prototype.trim=function(chars){return this.replace(new RegExp('^['+(chars||'\\uffef\\u00a0\\s')+']+|['+(chars||'\\uffef\\u00a0\\s')+']+$','g'),'')};
+
+function csv(str) {
+	let rows = str.trim().split('\n');
+	rows = rows.map((row) => {
+		let cells = row.match(/((?!,)|(?=^))("[^"]*"|[^,]*)(?=,|$)/g);
+		if (cells && cells.length) {
+			cells = cells.map(t => t.trim('"'));
+		}
+		return cells;
+	});
+	const header = {};
+	rows.shift().forEach((h, i) => {
+		header[i] = h.trim();
+	});
+	return rows.map((row) => {
+		return row.reduce((obj, cell, i) => {
+			console.log('Sam, in reduce, obj:', obj);
+			obj[header[i]] = cell;
+			return obj;
+		}, {});
+	});
+}
+
+/*
 globalThis.csv = {
 	splitRow(r) {
 		let cells = r.match(/((?!,)|(?=^))("[^"]*"|[^,]*)(?=,|$)/g);
@@ -13,6 +39,27 @@ globalThis.csv = {
 		});
 		return r;
 	},
+};
+/**/
+
+function ajax({
+	url,
+} = {
+}) {
+	return new Promise((resolve, reject) => {
+		const xhr = new XMLHttpRequest();
+		xhr.onreadystatechange = () => {
+			if (xhr.readyState === 4) {
+				if (Math.floor(xhr.status / 100) === 2) {
+					resolve(csv(xhr.response));
+				} else {
+					reject();
+				}
+			}
+		};
+		xhr.open('GET', url);
+		xhr.send();
+	});
 };
 
 globalThis.gtfs = {
@@ -125,7 +172,25 @@ globalThis.gtfs = {
 		$(document).trigger($.Event('loaded', { file:'stops.txt' }));
 	},
 	// Load and Draw GTFS Shapes
-	loadGTFS(url) {
+	async loadGTFS(url) {
+		const oneDay = 7 * 24 * 60 * 60 * 1000;
+		console.log('Sam, in loadGTFS. url:', url);
+		const aj = await ajax({
+			url: `/gtfs/${url}/agency.txt`,
+		});
+		console.log('Sam, aj:', aj);
+
+		// TODO: Load Agency Information
+		/*
+		// TODO: Cache txt files in Cache
+		const dateAgency = Number.parseInt(localStorage.getItem(`gtfs.${url}.agency.date`));
+		const txtAgency = localStorage.getItem(`gtfs.${url}.agency.txt`);
+		if (!Number.isFinite(dateAgency) || !txtAgency) {
+		}
+		/**/
+
+		return;
+
 		if (
 			!localStorage.getItem('gtfs.' + url + '.agency.txt')
 			|| !localStorage.getItem('gtfs.' + url + '.agency.date')
@@ -350,6 +415,6 @@ yodasws.on('loaded', (e) => {
 onmessage = (e) => {
 	const [fn, ...args] = e.data;
 	if (typeof gtfs[fn] === 'function') {
-		gtfs[fn](args);
+		gtfs[fn](...args);
 	}
 }

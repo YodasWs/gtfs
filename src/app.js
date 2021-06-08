@@ -9,31 +9,34 @@ function showNoGoogleError() {
 	[...document.querySelectorAll('.no-google')].forEach((div) => {
 		div.removeAttribute('hidden');
 	});
+	[...document.querySelectorAll('#google-maps')].forEach((el) => {
+		el.setAttribute('hidden', 'hidden');
+	});
 }
+function showNoWorkerError() {
+	setTitleError();
+	[...document.querySelectorAll('.no-workers')].forEach((div) => {
+		div.removeAttribute('hidden');
+	});
+}
+
 yodasws.page('home').setRoute({
 	template: 'pages/home.html',
 	route: '/([a-z]{2}/(\\w+/)?)?',
 }).on('load', () => {
 	// Require Web Workers
 	if (!window.Worker) {
+		showNoWorkerError();
 		return;
 	}
 
 	// Start loading GTFS files
 	const gtfs = new Worker('res/gtfs.js');
 	if (!(gtfs instanceof Worker)) {
-		setTitleError();
-		[...document.querySelectorAll('.no-workers')].forEach((div) => {
-			div.removeAttribute('hidden');
-		});
+		showNoWorkerError();
 		return;
 	}
 	gtfs.loadedFiles = [];
-
-	if (!google || !google.maps) {
-		showNoGoogleError();
-		return;
-	}
 
 	// Get basic information about location
 	const loc = (() => {
@@ -78,14 +81,16 @@ yodasws.page('home').setRoute({
 		h2.innerHTML = loc.title;
 	})();
 
+	// Require Google Maps JavaScript API
+	if (!google || !google.maps) {
+		showNoGoogleError();
+		return;
+	}
 	const div = document.getElementById('google-maps');
 	if (!(div instanceof Element)) {
 		showNoGoogleError();
 		return;
 	}
-	[...document.querySelectorAll('#google-maps, .gtfs')].forEach((el) => {
-		el.removeAttribute('hidden');
-	});
 
 	// Load and Display Google Maps
 	const geocoder = new google.maps.Geocoder();
