@@ -1,7 +1,14 @@
-[y-page='home'] {
+$col1: "screen";
+$col2: "(min-width: 500px)";
+$col3: "(min-width: 800px)";
+$col4: "(min-width: 1000px)";
+
+[y-page="home"] {
 	display: flex;
-	flex-flow: row wrap;
-	align-items: flex-start;
+	flex-flow: column nowrap;
+	align-items: stretch;
+	$gap: 1rem;
+	gap: $gap;
 
 	> h2 {
 		flex-basis: 100%;
@@ -12,11 +19,7 @@
 	> #google-maps {
 		min-height: 400px;
 		flex-basis: 100%;
-		margin: 0;
-
-		@media (min-width: 800px) {
-			flex-basis: 70%;
-		}
+		align-self: stretch;
 	}
 
 	> section {
@@ -52,9 +55,45 @@
 		}
 	}
 
-	footer {
+	> footer {
 		flex-basis: 100%;
 		font-size: 0.8em;
 		order: 1000;
+
+		> p:first-child {
+			margin-top: 0;
+		}
+	}
+
+	@media #{$col2} {
+		display: flex;
+		flex-flow: row wrap;
+		align-items: flex-start;
+
+		> section {
+			flex-basis: calc((100% - 1 * #{$gap}) / 2);
+		}
+	}
+
+	@media #{$col3} {
+		justify-content: space-between;
+
+		> #google-maps {
+			flex-basis: 70%;
+
+			~ section:first-of-type {
+				flex-basis: calc(30% - #{$gap});
+			}
+		}
+
+		> section {
+			flex-basis: calc((100% - 2 * #{$gap}) / 3);
+		}
+	}
+
+	@media #{$col4} {
+		> section {
+			flex-basis: calc((100% - 3 * #{$gap}) / 4);
+		}
 	}
 }
