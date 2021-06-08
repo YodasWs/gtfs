@@ -6,17 +6,36 @@ yodasws.page('home').setRoute({
 	if (!google || !google.maps) {
 		return;
 	}
-	const loc = ({
-		'jp/hakone': {
-			search: 'Hakone, Japan',
-		},
-		'us/charlotte': {
-			search: 'Charlotte, NC, USA',
-		},
-	})[window.location.hash.replace(/^#!\/|\/$/g, '')];
+
+	// Get basic information about location
+	const loc = (() => {
+		const loc = window.location.hash.replace(/^#!\/|\/$/g, '');
+		let locs = {
+			'jp/hakone': {
+				search: 'Hakone, Japan',
+				title: 'Hakone, Japan',
+			},
+			'us/charlotte': {
+				search: 'Charlotte, NC, USA',
+				title: 'Charlotte',
+			},
+		};
+		if (locs[loc]) {
+			return locs[loc];
+		}
+		locs = Object.entries(locs).filter(([key, obj]) => key.includes(loc));
+		return locs[Math.floor(Math.random() * locs.length)][1];
+	})();
+
 	if (!loc) {
 		return;
 	}
+
+	(() => {
+		const h2 = document.querySelector('main > h2');
+		if (!(h2 instanceof Element)) return;
+		h2.innerHTML = loc.title;
+	})();
 
 	const div = document.getElementById('google-maps');
 	if (!(div instanceof Element)) {
@@ -180,7 +199,6 @@ $(document).ready(() => {
 });
 
 yodasws.on('page-loaded', () => {
-}).on('site-loaded', () => {
 	if (typeof $ === 'undefined' || !$) return;
 
 	// Highlight Routes
