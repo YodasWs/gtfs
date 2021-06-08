@@ -1,4 +1,4 @@
-window.csv = {
+globalThis.csv = {
 	splitRow(r) {
 		let cells = r.match(/((?!,)|(?=^))("[^"]*"|[^,]*)(?=,|$)/g);
 		if (cells && cells.length) {
@@ -15,7 +15,7 @@ window.csv = {
 	},
 };
 
-window.gtfs = {
+globalThis.gtfs = {
 	extremes: { north: -90, south: 180, east: -180, west: 180 },
 	loadedFiles: [],
 	tripRoute: {},
@@ -237,7 +237,7 @@ window.gtfs = {
 					poly.Polyline.setMap(this.map);
 					// TODO: When Polyline clicked, activate Route Stop List
 				});
-				yodasws.fire('loaded', { file: 'shapes.txt' });
+				// yodasws.fire('loaded', { file: 'shapes.txt' });
 			},
 		});
 		if (
@@ -340,10 +340,12 @@ window.gtfs = {
 	},
 };
 
+/*
 yodasws.on('loaded', (e) => {
 	console.log('Sam, loaded, e:', e);
 	gtfs.loadedFiles.push(e.file);
 });
+/**/
 
 onmessage = (e) => {
 	const [fn, ...args] = e.data;

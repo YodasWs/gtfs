@@ -1,9 +1,36 @@
 /* app.json */
+function setTitleError() {
+	const h2 = document.querySelector('main > h2');
+	if (!(h2 instanceof Element)) return;
+	h2.innerHTML = 'Error';
+}
+function showNoGoogleError() {
+	setTitleError();
+	[...document.querySelectorAll('.no-google')].forEach((div) => {
+		div.removeAttribute('hidden');
+	});
+}
 yodasws.page('home').setRoute({
 	template: 'pages/home.html',
 	route: '/([a-z]{2}/(\\w+/)?)?',
 }).on('load', () => {
+	// Require Web Workers
+	if (!window.Worker) {
+		return;
+	}
+
+	const gtfs = new Worker('res/gtfs.js');
+	if (!(gtfs instanceof Worker)) {
+		setTitleError();
+		[...document.querySelectorAll('.no-workers')].forEach((div) => {
+			div.removeAttribute('hidden');
+		});
+		return;
+	}
+	gtfs.loadedFiles = [];
+
 	if (!google || !google.maps) {
+		showNoGoogleError();
 		return;
 	}
 
@@ -28,6 +55,7 @@ yodasws.page('home').setRoute({
 	})();
 
 	if (!loc) {
+		showNoGoogleError();
 		return;
 	}
 
@@ -39,6 +67,7 @@ yodasws.page('home').setRoute({
 
 	const div = document.getElementById('google-maps');
 	if (!(div instanceof Element)) {
+		showNoGoogleError();
 		return;
 	}
 	[...document.querySelectorAll('#google-maps, .gtfs')].forEach((el) => {
@@ -97,19 +126,12 @@ yodasws.page('home').setRoute({
 				});
 			});
 		} else {
+			showNoGoogleError();
 			console.log('Sam, Geocoder failed,', status);
 		}
 	});
 
 	return;
-
-	// Require Web Workers
-	if (!window.Worker) return;
-	console.log('Sam, going to load the worker!');
-	const gtfs = new Worker('res/gtfs.js');
-	if (!(gtfs instanceof Worker)) return;
-	console.log('Sam, let\'s go!');
-	gtfs.loadedFiles = [];
 
 	// Call loadGTFS on each location in travels.json
 	// eg: gtfs.loadGTFS('js/hakone');
