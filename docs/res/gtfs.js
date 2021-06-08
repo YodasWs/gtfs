@@ -3,10 +3,11 @@ String.prototype.trim=function(chars){return this.replace(new RegExp('^['+(chars
 
 function csv(str) {
 	let rows = str.trim().split('\n');
-	rows = rows.map((row) => {
-		let cells = row.match(/((?!,)|(?=^))("[^"]*"|[^,]*)(?=,|$)/g);
-		if (cells && cells.length) {
-			cells = cells.map(t => t.trim('"'));
+	rows = rows.map((row, i) => {
+		// https://stackoverflow.com/questions/8493195/how-can-i-parse-a-csv-string-with-javascript-which-contains-comma-in-data
+		let cells = row.match(/(?!\s+$)\s*('([^'\\]*(?:\\[\S\s][^'\\]*)*)'|"([^"\\]*(?:\\[\S\s][^"\\]*)*)"|([^,'"\s\\]*(?:\s+[^,'"\s\\]+)*))\s*(?:,|$)/g);
+		if (Array.isArray(cells)) {
+			cells = cells.map(t => t.trim(',"'));
 		}
 		return cells;
 	});
@@ -140,7 +141,21 @@ globalThis.gtfs = {
 		ajax({
 			url: `/gtfs/${url}/agency.txt`,
 		}).then((agencies) => {
+			console.log('Sam, agencies:', agencies);
 			postMessage(['listAgencies', agencies]);
+		});
+
+		ajax({
+			url: `/gtfs/${url}/routes.txt`,
+		}).then((routes) => {
+			routes.forEach((route) => {
+				route.x_route_icon = `&#x1f6${route.x_route_icon || '8d'};`;
+				route.route_text_color = `#${route.route_text_color || '000000'}`;
+				route.route_color = `#${route.route_color || 'ffffff'}`;
+				route.stops = [];
+			});
+			console.log('Sam, routes:', routes);
+			// postMessage(['listRoutes', routes]);
 		});
 
 		// TODO: Cache txt files in Cache
@@ -148,41 +163,6 @@ globalThis.gtfs = {
 
 		return;
 
-		if (
-			!localStorage.getItem('gtfs.' + url + '.routes.date')
-			|| !localStorage.getItem('gtfs.' + url + '.routes.head')
-			|| !localStorage.getItem('gtfs.' + url + '.routes.array')
-			|| Number.parseInt(localStorage.getItem('gtfs.' + url + '.routes.date'), 10) < Date.now() - 1000 * 60 * 60 * 24 * 7
-		) {
-			$.ajax({
-				url:'/gtfs/' + url + '/routes.txt',
-				dateType:'text',
-				success: (data) => {
-					const rows = data.split('\n');
-					const head = csv.parseHeader(rows.shift());
-					rows.forEach((r) => {
-						r = r.split(',');
-						if (!r || r[head.route_id] == '') return;
-						// Save Pertinent Route Data
-						this.routes[r[head.route_id]] = this.routes[r[head.route_id]] || {};
-						this.routes[r[head.route_id]].txtColor = '#' + (r[head.route_text_color] || '000000');
-						this.routes[r[head.route_id]].color = '#' + (r[head.route_color] || 'ffffff');
-						this.routes[r[head.route_id]].icon = '&#x1f6' + (r[head.x_route_icon] || '8d') + ';';
-						this.routes[r[head.route_id]].name = r[head.route_long_name];
-						this.routes[r[head.route_id]].type = r[head.route_type];
-						this.routes[r[head.route_id]].num = r[head.route_short_name];
-						this.routes[r[head.route_id]].stops = [];
-					});
-					localStorage.setItem('gtfs.' + url + '.routes.date', Date.now());
-					localStorage.setItem('gtfs.' + url + '.routes.head', JSON.stringify(head));
-					localStorage.setItem('gtfs.' + url + '.routes.array', JSON.stringify(gtfs.routes));
-					$(document).trigger($.Event('loaded', { file:'routes.txt' }));
-				},
-			});
-		} else {
-			this.routes = JSON.parse(localStorage['gtfs.' + url + '.routes.array']);
-			$(document).trigger($.Event('loaded', { file:'routes.txt' }));
-		}
 		$.ajax({
 			url:'/gtfs/' + url + '/trips.txt',
 			dateType:'text',
@@ -204,6 +184,7 @@ globalThis.gtfs = {
 				$(document).trigger($.Event('loaded', { file:'trips.txt' }));
 			},
 		});
+
 		$.ajax({
 			url:'/gtfs/' + url + '/shapes.txt',
 			dateType:'text',
@@ -245,6 +226,7 @@ globalThis.gtfs = {
 				// yodasws.fire('loaded', { file: 'shapes.txt' });
 			},
 		});
+
 		if (
 			!localStorage.getItem('gtfs.' + url + '.stops.date')
 			|| !localStorage.getItem('gtfs.' + url + '.stops.text')
@@ -261,6 +243,7 @@ globalThis.gtfs = {
 		} else {
 			this.parseStops(localStorage.getItem('gtfs.' + url + '.stops.text'))
 		}
+
 		$.ajax({
 			url:'/gtfs/' + url + '/stop_times.txt',
 			success: (data) => {
@@ -344,13 +327,6 @@ globalThis.gtfs = {
 		$(document).trigger($.Event('loaded', { file: 'trips.txt', locale }));
 	},
 };
-
-/*
-yodasws.on('loaded', (e) => {
-	console.log('Sam, loaded, e:', e);
-	gtfs.loadedFiles.push(e.file);
-});
-/**/
 
 onmessage = (e) => {
 	const [fn, ...args] = e.data;
