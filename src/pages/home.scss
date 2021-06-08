@@ -24,8 +24,15 @@
 		padding: 2px 1rem 1rem;
 
 		> h1 {
-			text-align: center;
 			margin: 0.5rem 0;
+
+			&:only-of-type {
+				text-align: center;
+			}
+
+			&:nth-of-type(n + 2) {
+				margin-top: 1rem;
+			}
 		}
 	}
 
@@ -37,8 +44,11 @@
 		}
 
 		> a[href] {
-			text-align: center;
 			font-size: smaller;
+
+			&:only-of-type {
+				text-align: center;
+			}
 		}
 	}
 
