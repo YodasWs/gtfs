@@ -20,6 +20,31 @@ function showNoWorkerError() {
 	});
 }
 
+class GTFS extends Worker {
+	constructor(...args) {
+		super(...args);
+	}
+
+	listAgencies(agencies) {
+		if (!Array.isArray(agencies)) {
+			return;
+		}
+		const el = document.createElement('section');
+		el.classList.add('agency');
+		agencies.forEach((agency) => {
+			if (!agency || agency.agency_id == '') return;
+			el.insertAdjacentHTML('beforeend', `<h1>${agency.agency_name}`);
+			if (agency.agency_url) {
+				el.insertAdjacentHTML('beforeend', `<a href="${agency.agency_url}" target="_blank">Agency Website`);
+			}
+		});
+		[...document.querySelectorAll('main section.agency')].forEach((el) => {
+			el.remove();
+		});
+		document.querySelector('main').appendChild(el);
+	}
+};
+
 yodasws.page('home').setRoute({
 	template: 'pages/home.html',
 	route: '/([a-z]{2}/(\\w+/)?)?',
@@ -31,12 +56,17 @@ yodasws.page('home').setRoute({
 	}
 
 	// Start loading GTFS files
-	const gtfs = new Worker('res/gtfs.js');
+	const gtfs = new GTFS('res/gtfs.js');
 	if (!(gtfs instanceof Worker)) {
 		showNoWorkerError();
 		return;
 	}
-	gtfs.loadedFiles = [];
+	gtfs.onmessage = (e) => {
+		const [fn, ...args] = e.data;
+		if (typeof gtfs[fn] === 'function') {
+			gtfs[fn](...args);
+		}
+	}
 
 	// Get basic information about location
 	const loc = (() => {
@@ -158,11 +188,6 @@ yodasws.page('home').setRoute({
 		'loadGTFS',
 		`${locale.cc}/${locale.name.toLowerCase().replace(/\W+/g, '_')}`,
 	]);
-
-//	TODO: Receive Message from Web Worker
-gtfs.onmessage = (e) => {
-	gtfs.loadedFiles.push(e.file);
-};
 
 $(document).ready(() => {
 	// Highlight Routes
