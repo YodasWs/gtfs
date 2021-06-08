@@ -29,6 +29,10 @@ class GTFS extends Worker {
 		if (!Array.isArray(agencies)) {
 			return;
 		}
+		const main = document.querySelector('main');
+		if (!(main instanceof Element)) {
+			return;
+		}
 		const el = document.createElement('section');
 		el.classList.add('agency');
 		agencies.forEach((agency) => {
@@ -38,10 +42,8 @@ class GTFS extends Worker {
 				el.insertAdjacentHTML('beforeend', `<a href="${agency.agency_url}" target="_blank">Agency Website`);
 			}
 		});
-		[...document.querySelectorAll('main section.agency')].forEach((el) => {
-			el.remove();
-		});
-		document.querySelector('main').appendChild(el);
+		[...document.querySelectorAll('main section.agency')].forEach(s => s.remove());
+		main.appendChild(el);
 	}
 };
 
@@ -165,13 +167,15 @@ yodasws.page('home').setRoute({
 			gtfs.map.zoom = gtfs.map.getZoom();
 			gtfs.map.addListener('zoom_changed', (e) => {
 				// Make Lines Thicker for Easier Reading
-				const weightAdjust = (gtfs.map.zoom >= 14 ? gtfs.map.zoom - 13 : 6 - Math.floor((gtfs.map.zoom - 1) / 2));
-				Object.values(gtfs.poly).forEach((poly) => {
-					if (!gtfs.poly[i].Polyline) return;
-					poly.Polyline.setOptions({
-						strokeWeight: poly.weight + weightAdjust,
+				if (gtfs.poly && typeof gtfs.poly === 'object') {
+					const weightAdjust = (gtfs.map.zoom >= 14 ? gtfs.map.zoom - 13 : 6 - Math.floor((gtfs.map.zoom - 1) / 2));
+					Object.values(gtfs.poly).forEach((poly) => {
+						if (!gtfs.poly[i].Polyline) return;
+						poly.Polyline.setOptions({
+							strokeWeight: poly.weight + weightAdjust,
+						});
 					});
-				});
+				}
 			});
 		} else {
 			showNoGoogleError();

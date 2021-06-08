@@ -1,6 +1,7 @@
 [y-page='home'] {
 	display: flex;
 	flex-flow: row wrap;
+	align-items: flex-start;
 
 	> h2 {
 		flex-basis: 100%;
@@ -18,9 +19,32 @@
 		}
 	}
 
+	> section {
+		border: 1px solid grey;
+		padding: 2px 1rem 1rem;
+
+		> h1 {
+			text-align: center;
+			margin: 0.5rem 0;
+		}
+	}
+
+	> section.agency {
+		order: 10;
+
+		> * {
+			display: block;
+		}
+
+		> a[href] {
+			text-align: center;
+			font-size: smaller;
+		}
+	}
 
 	footer {
 		flex-basis: 100%;
 		font-size: 0.8em;
+		order: 1000;
 	}
 }

@@ -61,30 +61,6 @@ comp-gtfs {
 		}
 	}
 
-	> section.agency {
-		padding: 2px 1rem 1rem;
-		margin: 0.5rem;
-		order: 10;
-
-		> * {
-			display: block;
-		}
-
-		> h1 {
-			text-align: center;
-			margin: 0;
-		}
-
-		> h1:nth-of-type(n + 2) {
-			margin-top: 1rem;
-		}
-
-		> a[href] {
-			text-align: center;
-			font-size: smaller;
-		}
-	}
-
 	> small.gtfs {
 		display: none;
 		order: 100;
@@ -101,10 +77,6 @@ comp-gtfs {
 }
 
 @media (max-width: 600px) {
-	#google-maps.gtfs {
-		margin-right: 0;
-	}
-
 	comp-gtfs {
 		> section[data-route-id]:first-of-type,
 		> section[data-route-id].active,
@@ -113,12 +85,5 @@ comp-gtfs {
 			max-width: none;
 			margin: 0;
 		}
-	}
-}
-
-@media (min-width: 800px) {
-	#google-maps.gtfs {
-		margin-right: 5px;
-		flex-basis: 70%;
 	}
 }

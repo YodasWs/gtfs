@@ -137,13 +137,11 @@ globalThis.gtfs = {
 	},
 	// Load and Draw GTFS Shapes
 	async loadGTFS(url) {
-		const oneDay = 7 * 24 * 60 * 60 * 1000;
-		console.log('Sam, in loadGTFS. url:', url);
-		const agencies = await ajax({
+		ajax({
 			url: `/gtfs/${url}/agency.txt`,
+		}).then((agencies) => {
+			postMessage(['listAgencies', agencies]);
 		});
-		console.log('Sam, agencies:', agencies);
-		postMessage(['listAgencies', agencies]);
 
 		// TODO: Cache txt files in Cache
 		// https://developer.mozilla.org/en-US/docs/Web/API/Cache
