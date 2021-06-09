@@ -32,7 +32,52 @@ class GTFS extends Worker {
 		this.shapes = {};
 	}
 
-	setExtremes(latlng) {
+	enlargeExtremes(latlng) {
+		if (latlng instanceof google.maps.LatLng) {
+			this.extremes = {
+				north: Math.max(this.extremes.north, latlng.lat()),
+				south: Math.min(this.extremes.south, latlng.lat()),
+				east: Math.max(this.extremes.east, latlng.lng()),
+				west: Math.min(this.extremes.west, latlng.lng()),
+			};
+		}
+		if (latlng instanceof google.maps.LatLngBounds) {
+			this.extremes = {
+				north: Math.max(this.extremes.north, latlng.Ua.i),
+				south: Math.min(this.extremes.south, latlng.Ua.g),
+				east: Math.max(this.extremes.east, latlng.La.i),
+				west: Math.min(this.extremes.west, latlng.La.g),
+			};
+		}
+		if (Number.isFinite(latlng.lat)) {
+			this.extremes = {
+				north: Math.max(this.extremes.north, latlng.lat),
+				south: Math.min(this.extremes.south, latlng.lat),
+			};
+		}
+		if (Number.isFinite(latlng.lng)) {
+			this.extremes = {
+				east: Math.max(this.extremes.east, latlng.lng),
+				west: Math.min(this.extremes.west, latlng.lng),
+			};
+		}
+		if (Number.isFinite(latlng.north)) {
+			this.extremes.north = Math.max(this.extremes.north, latlng.north);
+		}
+		if (Number.isFinite(latlng.south)) {
+			this.extremes.south = Math.min(this.extremes.south, latlng.south);
+		}
+		if (Number.isFinite(latlng.east)) {
+			this.extremes.east = Math.max(this.extremes.east, latlng.east);
+		}
+		if (Number.isFinite(latlng.west)) {
+			this.extremes.west = Math.min(this.extremes.west, latlng.west);
+		}
+		this.map.setOptions({
+			restriction: {
+				latLngBounds: this.extremes,
+			},
+		});
 	}
 
 	listAgencies(agencies) {
@@ -69,8 +114,8 @@ class GTFS extends Worker {
 	}
 
 	drawPolyline(shape) {
-		if (google && this.map) {
-			const poly = new google.maps.Polyline({
+		if (google && this.map && Array.isArray(shape.path) && shape.path.length > 1) {
+			shape.poly = new google.maps.Polyline({
 				path: shape.path,
 				geodesic: true,
 				strokeColor: '#008800',
@@ -79,46 +124,20 @@ class GTFS extends Worker {
 				strokeOpacity: 1,
 				clickable: true,
 			});
-			poly.setMap(this.map);
+			shape.poly.setMap(this.map);
 
-			const center = this.map.getCenter();
-			if (center) {
-				this.extremes = {
-					north: Math.max(this.extremes.north, center.lat()),
-					south: Math.min(this.extremes.south, center.lat()),
-					east: Math.max(this.extremes.east, center.lng()),
-					west: Math.min(this.extremes.west, center.lng()),
-				};
-			}
-			const bounds = this.map.getBounds();
-			console.log('Sam, bounds:', bounds);
-			if (bounds) {
-				this.extremes = {
-					north: Math.max(this.extremes.north, bounds.Ua.i),
-					south: Math.min(this.extremes.south, bounds.Ua.g),
-					east: Math.max(this.extremes.east, bounds.La.i),
-					west: Math.min(this.extremes.west, bounds.La.g),
-				};
-			}
+			let bounds = {
+				...this.extremes,
+			};
 			shape.path.forEach((pt) => {
-				this.extremes = {
-					north: Math.max(this.extremes.north, pt.lat),
-					south: Math.min(this.extremes.south, pt.lat),
-					east: Math.max(this.extremes.east, pt.lng),
-					west: Math.min(this.extremes.west, pt.lng),
+				bounds = {
+					north: Math.max(bounds.north, pt.lat),
+					south: Math.min(bounds.south, pt.lat),
+					east: Math.max(bounds.east, pt.lng),
+					west: Math.min(bounds.west, pt.lng),
 				};
 			});
-			this.map.setOptions({
-				restriction: {
-					latLngBounds: this.extremes,
-				},
-				padding: {
-					bottom: 10,
-					right: 10,
-					left: 10,
-					top: 10,
-				},
-			});
+			this.enlargeExtremes(bounds);
 		}
 	}
 };
@@ -252,10 +271,16 @@ yodasws.page('home').setRoute({
 					});
 				}
 			});
-			setTimeout(gtfs.drawPolylines.bind(gtfs), 0);
+			const loadHandler = gtfs.map.addListener('tilesloaded', () => {
+				gtfs.enlargeExtremes(gtfs.map.getBounds());
+				google.maps.event.removeListener(loadHandler);
+			});
+			setTimeout(() => {
+				gtfs.drawPolylines();
+			}, 0);
 		} else {
 			showNoGoogleError();
-			console.log('Sam, Geocoder failed,', status);
+			console.error('Sam, Geocoder failed,', status);
 		}
 	});
 
