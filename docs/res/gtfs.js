@@ -158,6 +158,45 @@ globalThis.gtfs = {
 			// postMessage(['listRoutes', routes]);
 		});
 
+		ajax({
+			url: `/gtfs/${url}/trips.txt`,
+		}).then((trips) => {
+			console.log('Sam, trips:', trips);
+		});
+
+		ajax({
+			url: `/gtfs/${url}/shapes.txt`,
+		}).then((shapes) => {
+			console.log('Sam, shapes:', shapes);
+			const points = {};
+			shapes.forEach((point) => {
+				points[point.shape_id] ??= [];
+				points[point.shape_id].push({
+					lat: Number.parseFloat(point.shape_pt_lat),
+					lng: Number.parseFloat(point.shape_pt_lon),
+					seq: Number.parseFloat(point.shape_pt_sequence),
+				});
+			});
+			Object.entries(points).forEach(([id, path]) => {
+				path.sort((a, b) => a.seq - b .seq);
+				postMessage(['updateShape', id, {
+					path,
+				}]);
+			});
+		});
+
+		ajax({
+			url: `/gtfs/${url}/stops.txt`,
+		}).then((stops) => {
+			console.log('Sam, stops:', stops);
+		});
+
+		ajax({
+			url: `/gtfs/${url}/stop_times.txt`,
+		}).then((stop_times) => {
+			console.log('Sam, stop_times:', stop_times);
+		});
+
 		// TODO: Cache txt files in Cache
 		// https://developer.mozilla.org/en-US/docs/Web/API/Cache
 

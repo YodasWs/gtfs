@@ -23,6 +23,16 @@ function showNoWorkerError() {
 class GTFS extends Worker {
 	constructor(...args) {
 		super(...args);
+		this.extremes = {
+			north: -90,
+			south: 90,
+			east: -180,
+			west: 180,
+		};
+		this.shapes = {};
+	}
+
+	setExtremes(latlng) {
 	}
 
 	listAgencies(agencies) {
@@ -44,6 +54,72 @@ class GTFS extends Worker {
 		});
 		[...document.querySelectorAll('main section.agency')].forEach(s => s.remove());
 		main.appendChild(el);
+	}
+
+	updateShape(id, shape) {
+		this.shapes[id] = {
+			...this.shapes[id],
+			...shape
+		};
+		this.drawPolyline(this.shapes[id]);
+	}
+
+	drawPolylines() {
+		Object.values(this.shapes).forEach(this.drawPolyline.bind(this));
+	}
+
+	drawPolyline(shape) {
+		if (google && this.map) {
+			const poly = new google.maps.Polyline({
+				path: shape.path,
+				geodesic: true,
+				strokeColor: '#008800',
+				strokeWeight: 2,
+				opacity: 0.6,
+				strokeOpacity: 1,
+				clickable: true,
+			});
+			poly.setMap(this.map);
+
+			const center = this.map.getCenter();
+			if (center) {
+				this.extremes = {
+					north: Math.max(this.extremes.north, center.lat()),
+					south: Math.min(this.extremes.south, center.lat()),
+					east: Math.max(this.extremes.east, center.lng()),
+					west: Math.min(this.extremes.west, center.lng()),
+				};
+			}
+			const bounds = this.map.getBounds();
+			console.log('Sam, bounds:', bounds);
+			if (bounds) {
+				this.extremes = {
+					north: Math.max(this.extremes.north, bounds.Ua.i),
+					south: Math.min(this.extremes.south, bounds.Ua.g),
+					east: Math.max(this.extremes.east, bounds.La.i),
+					west: Math.min(this.extremes.west, bounds.La.g),
+				};
+			}
+			shape.path.forEach((pt) => {
+				this.extremes = {
+					north: Math.max(this.extremes.north, pt.lat),
+					south: Math.min(this.extremes.south, pt.lat),
+					east: Math.max(this.extremes.east, pt.lng),
+					west: Math.min(this.extremes.west, pt.lng),
+				};
+			});
+			this.map.setOptions({
+				restriction: {
+					latLngBounds: this.extremes,
+				},
+				padding: {
+					bottom: 10,
+					right: 10,
+					left: 10,
+					top: 10,
+				},
+			});
+		}
 	}
 };
 
@@ -101,13 +177,12 @@ yodasws.page('home').setRoute({
 		loc.files,
 	]);
 
-	// Show Page to User
-	[...document.querySelectorAll('#google-maps, .gtfs')].forEach((el) => {
-		el.removeAttribute('hidden');
-	});
-
-	// Set Page Title
 	(() => {
+		// Show Page to User
+		[...document.querySelectorAll('#google-maps, .gtfs')].forEach((el) => {
+			el.removeAttribute('hidden');
+		});
+		// Set Page Title
 		const h2 = document.querySelector('main > h2');
 		if (!(h2 instanceof Element)) return;
 		h2.innerHTML = loc.title;
@@ -177,6 +252,7 @@ yodasws.page('home').setRoute({
 					});
 				}
 			});
+			setTimeout(gtfs.drawPolylines.bind(gtfs), 0);
 		} else {
 			showNoGoogleError();
 			console.log('Sam, Geocoder failed,', status);
