@@ -155,7 +155,7 @@ globalThis.gtfs = {
 				route.stops = [];
 			});
 			console.log('Sam, routes:', routes);
-			// postMessage(['listRoutes', routes]);
+			postMessage(['listRoutes', routes]);
 		});
 
 		ajax({
@@ -163,9 +163,7 @@ globalThis.gtfs = {
 		}).then((trips) => {
 			console.log('Sam, trips:', trips);
 			trips.forEach((trip) => {
-				postMessage(['updateShape', trip.shape_id, {
-					route_id: trip.route_id,
-				}]);
+				postMessage(['addRouteToShape', trip.shape_id, trip.route_id]);
 			});
 		});
 
@@ -200,6 +198,34 @@ globalThis.gtfs = {
 			url: `/gtfs/${url}/stop_times.txt`,
 		}).then((stop_times) => {
 			console.log('Sam, stop_times:', stop_times);
+
+			/*
+				// TODO: List stops along route
+				const list = document.createElement('ol');
+				section.appendChild(list);
+
+				// TODO: Use stops to draw shape
+				if (!this.poly[route.shape]) {
+					this.poly[route.shape] = {};
+					this.poly[route.shape].path = [];
+					// Use this List of Stops to draw a Polyline
+					route.stops.forEach((s) => {
+						this.poly[route.shape].path.push(this.stops[s]);
+					});
+					this.setShapeRoute(route.shape, i);
+					// Draw Polyline
+					this.poly[route.shape].Polyline = new google.maps.Polyline({
+						path: this.poly[route.shape].path,
+						geodesic: true,
+						strokeColor: (typeof this.poly[route.shape].color == 'string' ? this.poly[route.shape].color : '#008800'),
+						strokeWeight: (this.poly[route.shape].weight || 2),
+						opacity: this.poly[route.shape].opacity || .6,
+						strokeOpacity: 1,
+						clickable: true,
+					});
+					this.poly[route.shape].Polyline.setMap(this.map);
+				}
+			/**/
 		});
 
 		// TODO: Cache txt files in Cache

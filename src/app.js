@@ -101,6 +101,32 @@ class GTFS extends Worker {
 		main.appendChild(el);
 	}
 
+	listRoutes(routes) {
+		if (!Array.isArray(routes)) {
+			return;
+		}
+		const main = document.querySelector('main');
+		if (!(main instanceof Element)) {
+			return;
+		}
+
+		routes.forEach((route) => {
+			let section = document.querySelector(`section[data-route-id="${route.route_id}"]`);
+			if (!(section instanceof Element)) {
+				section = document.createElement('section');
+				section.setAttribute('data-route-id', route.route_id);
+			}
+			main.appendChild(section);
+
+			if (route.route_short_name) {
+				section.insertAdjacentHTML('afterbegin', `<h2 style="background:${route.route_color};color:${route.route_text_color}">${route.route_long_name}`);
+				section.insertAdjacentHTML('afterbegin', `<h1 style="background:${route.route_color};color:${route.route_text_color}">${route.x_route_icon} ${route.route_short_name}`);
+			} else {
+				section.insertAdjacentHTML('afterbegin', `<h1 style="background:${route.route_color};color:${route.route_text_color}">${route.x_route_icon} ${route.route_long_name}`);
+			}
+		});
+	}
+
 	addRouteToShape(id, shape_id, route_id) {
 		if (this.shapes[shape_id] === null || typeof this.shapes[shape_id] !== 'object') {
 			this.updateShape(shape_id);
