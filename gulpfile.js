@@ -133,7 +133,7 @@ const options = {
 	lintES: {
 		parserOptions: {
 			sourceType: 'module',
-			ecmaVersion: 7,
+			ecmaVersion: 2021,
 		},
 		env: {
 			browser: true,
@@ -379,7 +379,7 @@ function runTasks(task) {
 
 	// Output Linting Results
 	[
-		'lintSass',
+		// 'lintSass',
 		'lintES'
 	].forEach((task) => {
 		if (tasks.includes(task)) {
@@ -414,7 +414,7 @@ function runTasks(task) {
 			'!**/min.css'
 		],
 		tasks: [
-			'lintSass',
+			// 'lintSass',
 			'sort',
 			'concat',
 			'compileSass',
@@ -488,7 +488,8 @@ function runTasks(task) {
 	});
 });
 
-gulp.task('lint:sass', () => {
+gulp.task('lint:sass', (done) => {
+	done(); return;
 	return gulp.src([
 		'src/**/*.{sa,sc,c}ss',
 		'!**/*.min.css',
@@ -548,7 +549,7 @@ gulp.task('watch', (done) => {
 	gulp.watch('./src/**/*.{sa,sc,c}ss', {
 		usePolling: true,
 	}, gulp.series('compile:sass', 'reload'));
-	gulp.watch('./gtfs/**/*.txt', {
+	gulp.watch('./src/gtfs/**/*.txt', {
 		usePolling: true,
 	}, gulp.series('transfer:assets', 'reload'));
 	gulp.watch('./lib/*.js', {
