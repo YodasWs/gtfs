@@ -101,7 +101,17 @@ class GTFS extends Worker {
 		main.appendChild(el);
 	}
 
-	updateShape(id, shape) {
+	addRouteToShape(id, shape_id, route_id) {
+		if (this.shapes[shape_id] === null || typeof this.shapes[shape_id] !== 'object') {
+			this.updateShape(shape_id);
+		}
+		if (!(this.shapes[shape_id].routes instanceof Set)) {
+			this.shapes[shape_id].routes = new Set();
+		}
+		this.shapes[shape_id].routes.add(route_id);
+	}
+
+	updateShape(id, shape = null) {
 		this.shapes[id] = {
 			...this.shapes[id],
 			...shape
