@@ -148,8 +148,62 @@ globalThis.gtfs = {
 		ajax({
 			url: `/gtfs/${url}/routes.txt`,
 		}).then((routes) => {
-			routes.forEach((route) => {
-				route.x_route_icon = `&#x1f6${route.x_route_icon || '8d'};`;
+			routes.sort((a, b) => {
+				if (a.route_type !== b.route_type) {
+					const a_num = Number.parseInt(a.route_type);
+					const b_num = Number.parseInt(b.route_type);
+					if (Number.isFinite(a_num) && Number.isFinite(b_num) && a_num !== b_num) {
+						if (a_num === 3) return 1;
+						if (b_num === 3) return -1;
+						return a_num - b_num;
+					}
+				}
+				if (a.route_short_name && b.route_short_name) {
+					const a_num = Number.parseInt(a.route_short_name);
+					const b_num = Number.parseInt(b.route_short_name);
+					if (Number.isFinite(a_num) && Number.isFinite(b_num) && a_num !== b_num) {
+						return a_num - b_num;
+					}
+					return a.route_short_name.localeCompare(b.route_short_name);
+				}
+				return 0;
+			}).forEach((route) => {
+				console.log('Sam,', route.route_id, route.route_type, route.x_route_icon);
+				// TODO: Use route_type
+				if (!route.x_route_icon) {
+					switch (route.route_type) {
+						case '0':
+							route.x_route_icon = '1f688';
+							break;
+						case '1':
+							route.x_route_icon = '1f687';
+							break;
+						case '2':
+							route.x_route_icon = '1f686';
+							break;
+						case '3':
+							route.x_route_icon = '1f68c';
+							break;
+						case '4':
+							route.x_route_icon = '26f4';
+							break;
+						case '5':
+							route.x_route_icon = '1f683';
+							break;
+						case '6':
+							route.x_route_icon = '1f6a0';
+							break;
+						case '7':
+							route.x_route_icon = '1f69e';
+							break;
+						case '11':
+							route.x_route_icon = '1f68e';
+							break;
+						case '12':
+							route.x_route_icon = '1f69d';
+					}
+				}
+				route.x_route_icon = `&#x${route.x_route_icon || '1f68d'};&#xfe0f;`;
 				route.route_text_color = `#${route.route_text_color || '000000'}`;
 				route.route_color = `#${route.route_color || 'ffffff'}`;
 				route.stops = [];

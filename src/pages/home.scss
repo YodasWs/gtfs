@@ -20,6 +20,7 @@ $col4: "(min-width: 1000px)";
 		min-height: 400px;
 		flex-basis: 100%;
 		align-self: stretch;
+		order: 1;
 	}
 
 	> section {
@@ -52,6 +53,46 @@ $col4: "(min-width: 1000px)";
 			&:only-of-type {
 				text-align: center;
 			}
+		}
+	}
+
+	> section[data-route-id] {
+		display: flex;
+		flex-flow: column nowrap;
+
+		padding: 0;
+		order: 3;
+
+		&.highlighted {
+			order: 2;
+		}
+
+		&.active {
+			flex-basis: 25%;
+			flex-grow: 1;
+			order: 1;
+		}
+
+		> h1,
+		> h2 {
+			text-align: center;
+			cursor: pointer;
+			margin: 0;
+		}
+
+		> h1 {
+			font-size: 1.5em;
+			padding: 2px 5px;
+		}
+
+		> h2 {
+			font-size: 1.2em;
+			padding: 0 5px 5px;
+		}
+
+		> h1 + h2 {
+			position: relative;
+			top: -1px;
 		}
 	}
 
