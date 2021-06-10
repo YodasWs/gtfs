@@ -32,6 +32,7 @@ class GTFS extends Worker {
 			west: 180,
 		};
 		this.polylines = {};
+		this.shapes = {};
 	}
 
 	enlargeExtremes(latlng) {
@@ -135,6 +136,34 @@ class GTFS extends Worker {
 		});
 	}
 
+	zoomChangePolylines() {
+		console.log('Sam, zoomChangePolylines, zoom:', this.map.zoom);
+		let opacityAdjust = 1;
+		let weightAdjust = 0;
+		if (this.map.zoom >= 10) {
+			weightAdjust = 1;
+		}
+		if (this.map.zoom >= 11) {
+			weightAdjust = 6 - Math.floor((this.map.zoom - 1) / 2);
+		}
+		if (this.map.zoom >= 14) {
+			opacityAdjust = 1.5;
+			weightAdjust = this.map.zoom - 13;
+		}
+		if (this.map.zoom >= 16) {
+			weightAdjust = this.map.zoom - 14;
+		}
+		console.log('Sam, zoom change, weightAdjust:', weightAdjust);
+		Object.entries(this.shapes).forEach(([shape_id, shape]) => {
+			if (this.polylines[shape.shape_id] instanceof google.maps.Polyline) {
+				this.polylines[shape.shape_id].setOptions({
+					strokeOpacity: shape.opacity * opacityAdjust,
+					strokeWeight: shape.weight + weightAdjust,
+				});
+			}
+		});
+	}
+
 	drawPolylines(shapes) {
 		if (google && this.map) {
 			Object.values(shapes).forEach(this.drawPolyline.bind(this));
@@ -145,13 +174,12 @@ class GTFS extends Worker {
 		if (typeof google !== 'object' || typeof this.map !== 'object' || !Array.isArray(shape.path) || shape.path.length <= 1) {
 			return;
 		}
+		this.shapes[shape.shape_id] = shape;
 		console.log('Sam, bounds, drawing polyline,', shape.shape_id);
 		if (!(this.polylines[shape.shape_id] instanceof google.maps.Polyline)) {
 			this.polylines[shape.shape_id] = new google.maps.Polyline({
 				geodesic: true,
-				strokeWeight: 2,
 				opacity: 0.6,
-				strokeOpacity: 1,
 				clickable: true,
 				map: this.map,
 			});
@@ -177,6 +205,7 @@ class GTFS extends Worker {
 			})(shape.route_type),
 			path: shape.path,
 		});
+		this.zoomChangePolylines();
 
 		let bounds = {
 			...this.extremes,
@@ -326,14 +355,9 @@ yodasws.page('home').setRoute({
 		gtfs.map.zoom = gtfs.map.getZoom();
 		gtfs.map.addListener('zoom_changed', (e) => {
 			// Make Lines Thicker for Easier Reading
-			if (gtfs.poly && typeof gtfs.poly === 'object') {
-				const weightAdjust = (gtfs.map.zoom >= 14 ? gtfs.map.zoom - 13 : 6 - Math.floor((gtfs.map.zoom - 1) / 2));
-				Object.values(gtfs.poly).forEach((poly) => {
-					if (!gtfs.poly[i].Polyline) return;
-					poly.Polyline.setOptions({
-						strokeWeight: poly.weight + weightAdjust,
-					});
-				});
+			if (gtfs.polylines && typeof gtfs.polylines === 'object') {
+				console.log('Sam, zoom_changed and we have polylines');
+				gtfs.zoomChangePolylines();
 			}
 		});
 		const loadHandler = gtfs.map.addListener('tilesloaded', () => {

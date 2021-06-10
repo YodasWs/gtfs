@@ -53,7 +53,6 @@ globalThis.gtfs = {
 	trips: {},
 
 	tripRoute: {},
-	poly: {},
 
 	updateRoute(route_id, route = null) {
 		this.routes[route_id] = {
@@ -143,34 +142,34 @@ globalThis.gtfs = {
 				// Set Route Icon (emoji)
 				if (typeof route.x_route_icon !== 'string' || route.x_route_icon === '') {
 					switch (route.route_type) {
-						case '0':
+						case '0': // Tram, Streetcar, Light rail
 							route.x_route_icon = '1f688';
 							break;
-						case '1':
+						case '1': // Metro, Subway
 							route.x_route_icon = '1f687';
 							break;
-						case '2':
+						case '2': // Rail
 							route.x_route_icon = '1f686';
 							break;
-						case '3':
+						case '3': // Bus
 							route.x_route_icon = '1f68c';
 							break;
-						case '4':
+						case '4': // Ferry
 							route.x_route_icon = '26f4';
 							break;
-						case '5':
+						case '5': // Cable Car
 							route.x_route_icon = '1f683';
 							break;
-						case '6':
+						case '6': // Gondola
 							route.x_route_icon = '1f6a0';
 							break;
-						case '7':
+						case '7': // Funicular
 							route.x_route_icon = '1f69e';
 							break;
-						case '11':
+						case '11': // Trolleybus
 							route.x_route_icon = '1f68e';
 							break;
-						case '12':
+						case '12': // Monorail
 							route.x_route_icon = '1f69d';
 							break;
 						default:
@@ -569,6 +568,8 @@ globalThis.gtfs = {
 						const newShape = {
 							route_color: undefined,
 							route_type: undefined,
+							opacity: 0.5,
+							weight: 1,
 						};
 						if (!(shape.routes instanceof Set)) {
 							shape.routes = new Set();
@@ -583,6 +584,44 @@ globalThis.gtfs = {
 							}
 							if (typeof route.route_type === 'string' && route.route_type !== '') {
 								newShape.route_type = route.route_type;
+								switch (route.route_type) {
+									case '0': // Tram, Streetcar, Light rail
+										newShape.opacity = 0.7;
+										newShape.weight = 2;
+										break;
+									case '1': // Metro, Subway
+										newShape.opacity = 0.7;
+										newShape.weight = 2;
+										break;
+									case '2': // Rail
+										newShape.opacity = 0.7;
+										newShape.weight = 3;
+										break;
+									case '3': // Bus
+										newShape.opacity = 0.4;
+										break;
+									case '4': // Ferry
+										newShape.opacity = 1;
+										newShape.weight = 2;
+										break;
+									case '5': // Cable Car
+										// newShape.weight = 2;
+										break;
+									case '6': // Gondola
+										newShape.opacity = 0.4;
+										newShape.weight = 2;
+										break;
+									case '7': // Funicular
+										newShape.opacity = 0.7;
+										newShape.weight = 2;
+										break;
+									case '11': // Trolleybus
+										break;
+									case '12': // Monorail
+										newShape.opacity = 0.7;
+										newShape.weight = 2;
+										break;
+								}
 							}
 						});
 						this.updateShape(shape_id, newShape);
