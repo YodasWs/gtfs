@@ -20,6 +20,8 @@ function showNoWorkerError() {
 	});
 }
 
+// TODO: Place DOM and Maps manipulation here
+// TODO: Place Data manipulation in Worker
 class GTFS extends Worker {
 	constructor(...args) {
 		super(...args);
@@ -29,7 +31,6 @@ class GTFS extends Worker {
 			east: -180,
 			west: 180,
 		};
-		this.shapes = {};
 	}
 
 	enlargeExtremes(latlng) {
@@ -109,6 +110,7 @@ class GTFS extends Worker {
 		if (!(main instanceof Element)) {
 			return;
 		}
+		[...document.querySelectorAll('section[data-route-id]')].forEach(el => el.remove());
 
 		routes.forEach((route) => {
 			let section = document.querySelector(`section[data-route-id="${route.route_id}"]`);
@@ -127,26 +129,10 @@ class GTFS extends Worker {
 		});
 	}
 
-	addRouteToShape(id, shape_id, route_id) {
-		if (this.shapes[shape_id] === null || typeof this.shapes[shape_id] !== 'object') {
-			this.updateShape(shape_id);
+	drawPolylines(shapes) {
+		if (google && this.map) {
+			Object.values(shapes).forEach(this.drawPolyline.bind(this));
 		}
-		if (!(this.shapes[shape_id].routes instanceof Set)) {
-			this.shapes[shape_id].routes = new Set();
-		}
-		this.shapes[shape_id].routes.add(route_id);
-	}
-
-	updateShape(id, shape = null) {
-		this.shapes[id] = {
-			...this.shapes[id],
-			...shape
-		};
-		this.drawPolyline(this.shapes[id]);
-	}
-
-	drawPolylines() {
-		Object.values(this.shapes).forEach(this.drawPolyline.bind(this));
 	}
 
 	drawPolyline(shape) {
@@ -311,9 +297,6 @@ yodasws.page('home').setRoute({
 				gtfs.enlargeExtremes(gtfs.map.getBounds());
 				google.maps.event.removeListener(loadHandler);
 			});
-			setTimeout(() => {
-				gtfs.drawPolylines();
-			}, 0);
 		} else {
 			showNoGoogleError();
 			console.error('Sam, Geocoder failed,', status);
