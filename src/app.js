@@ -137,35 +137,38 @@ class GTFS extends Worker {
 	}
 
 	drawPolyline(shape) {
-		if (google && this.map && Array.isArray(shape.path) && shape.path.length > 1) {
-			if (!(this.polylines[shape.shape_id] instanceof google.maps.Polyline)) {
-				this.polylines[shape.shape_id] = new google.maps.Polyline({
-					geodesic: true,
-					strokeWeight: 2,
-					opacity: 0.6,
-					strokeOpacity: 1,
-					clickable: true,
-					map: this.map,
-				});
-			}
-			this.polylines[shape.shape_id].setOptions({
-				strokeColor: shape.route_color || '#008800',
-				path: shape.path,
-			});
-
-			let bounds = {
-				...this.extremes,
-			};
-			shape.path.forEach((pt) => {
-				bounds = {
-					north: Math.max(bounds.north, pt.lat),
-					south: Math.min(bounds.south, pt.lat),
-					east: Math.max(bounds.east, pt.lng),
-					west: Math.min(bounds.west, pt.lng),
-				};
-			});
-			this.enlargeExtremes(bounds);
+		if (typeof google !== 'object' || typeof this.map !== 'object' || !Array.isArray(shape.path) || shape.path.length <= 1) {
+			console.error('Sam, called drawPolyline but not yet ready,', shape);
+			return;
 		}
+		console.log('Sam, bounds, drawing polyline,', shape.shape_id);
+		if (!(this.polylines[shape.shape_id] instanceof google.maps.Polyline)) {
+			this.polylines[shape.shape_id] = new google.maps.Polyline({
+				geodesic: true,
+				strokeWeight: 2,
+				opacity: 0.6,
+				strokeOpacity: 1,
+				clickable: true,
+				map: this.map,
+			});
+		}
+		this.polylines[shape.shape_id].setOptions({
+			strokeColor: shape.route_color || '#008800',
+			path: shape.path,
+		});
+
+		let bounds = {
+			...this.extremes,
+		};
+		shape.path.forEach((pt) => {
+			bounds = {
+				north: Math.max(bounds.north, pt.lat),
+				south: Math.min(bounds.south, pt.lat),
+				east: Math.max(bounds.east, pt.lng),
+				west: Math.min(bounds.west, pt.lng),
+			};
+		});
+		this.enlargeExtremes(bounds);
 	}
 };
 
