@@ -31,6 +31,7 @@ class GTFS extends Worker {
 			east: -180,
 			west: 180,
 		};
+		this.polylines = {};
 	}
 
 	enlargeExtremes(latlng) {
@@ -137,16 +138,20 @@ class GTFS extends Worker {
 
 	drawPolyline(shape) {
 		if (google && this.map && Array.isArray(shape.path) && shape.path.length > 1) {
-			shape.poly = new google.maps.Polyline({
+			if (!(this.polylines[shape.shape_id] instanceof google.maps.Polyline)) {
+				this.polylines[shape.shape_id] = new google.maps.Polyline({
+					geodesic: true,
+					strokeWeight: 2,
+					opacity: 0.6,
+					strokeOpacity: 1,
+					clickable: true,
+					map: this.map,
+				});
+			}
+			this.polylines[shape.shape_id].setOptions({
+				strokeColor: shape.route_color || '#008800',
 				path: shape.path,
-				geodesic: true,
-				strokeColor: '#008800',
-				strokeWeight: 2,
-				opacity: 0.6,
-				strokeOpacity: 1,
-				clickable: true,
 			});
-			shape.poly.setMap(this.map);
 
 			let bounds = {
 				...this.extremes,
