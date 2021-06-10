@@ -153,6 +153,23 @@ class GTFS extends Worker {
 		}
 		this.polylines[shape.shape_id].setOptions({
 			strokeColor: shape.route_color || '#008800',
+			zIndex: ((route_type) => {
+				switch (route_type) {
+					case '0': // Tram, Streetcar, Light rail
+						return 8;
+					case '1': // Metro, Subway
+						return 9;
+					case '2': // Rail
+						return 10;
+					case '3': // Bus
+						return 0;
+					case '7': // Funicular
+						return 7;
+					case '12': // Monorail
+						return 9;
+				}
+				return 1;
+			})(shape.route_type),
 			path: shape.path,
 		});
 
