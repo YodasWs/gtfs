@@ -121,10 +121,10 @@ class GTFS extends Worker {
 			main.appendChild(section);
 
 			if (route.route_short_name) {
-				section.insertAdjacentHTML('afterbegin', `<h2 style="background:${route.route_color};color:${route.route_text_color}">${route.route_long_name}`);
-				section.insertAdjacentHTML('afterbegin', `<h1 style="background:${route.route_color};color:${route.route_text_color}">${route.x_route_icon} ${route.route_short_name}`);
+				section.insertAdjacentHTML('afterbegin', `<h2 style="background:${route.route_color};color:${route.route_text_color}">${route.x_route_icon}&#xfe0e; ${route.route_long_name}`);
+				section.insertAdjacentHTML('afterbegin', `<h1 style="background:${route.route_color};color:${route.route_text_color}">${route.x_route_icon}&#xfe0f; ${route.route_short_name}`);
 			} else {
-				section.insertAdjacentHTML('afterbegin', `<h1 style="background:${route.route_color};color:${route.route_text_color}">${route.x_route_icon} ${route.route_long_name}`);
+				section.insertAdjacentHTML('afterbegin', `<h1 style="background:${route.route_color};color:${route.route_text_color}">${route.x_route_icon}&#xfe0f; ${route.route_long_name} ${route.x_route_icon}&#xfe0e;`);
 			}
 		});
 	}
