@@ -138,7 +138,6 @@ class GTFS extends Worker {
 
 	drawPolyline(shape) {
 		if (typeof google !== 'object' || typeof this.map !== 'object' || !Array.isArray(shape.path) || shape.path.length <= 1) {
-			console.error('Sam, called drawPolyline but not yet ready,', shape);
 			return;
 		}
 		console.log('Sam, bounds, drawing polyline,', shape.shape_id);
