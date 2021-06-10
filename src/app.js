@@ -122,10 +122,10 @@ class GTFS extends Worker {
 			main.appendChild(section);
 
 			if (route.route_short_name) {
-				section.insertAdjacentHTML('afterbegin', `<h2 style="background:${route.route_color};color:${route.route_text_color}">${route.x_route_icon}&#xfe0e; ${route.route_long_name}`);
-				section.insertAdjacentHTML('afterbegin', `<h1 style="background:${route.route_color};color:${route.route_text_color}">${route.x_route_icon}&#xfe0f; ${route.route_short_name}`);
+				section.insertAdjacentHTML('afterbegin', `<h2 style="background:#${route.route_color || 'ffffff'};color:#${route.route_text_color || '000000'}">&#x${route.x_route_icon};&#xfe0e; ${route.route_long_name}`);
+				section.insertAdjacentHTML('afterbegin', `<h1 style="background:#${route.route_color || 'ffffff'};color:#${route.route_text_color || '000000'}">&#x${route.x_route_icon};&#xfe0f; ${route.route_short_name}`);
 			} else {
-				section.insertAdjacentHTML('afterbegin', `<h1 style="background:${route.route_color};color:${route.route_text_color}">${route.x_route_icon}&#xfe0f; ${route.route_long_name} ${route.x_route_icon}&#xfe0e;`);
+				section.insertAdjacentHTML('afterbegin', `<h1 style="background:#${route.route_color || 'ffffff'};color:#${route.route_text_color || '000000'}">&#x${route.x_route_icon};&#xfe0f; ${route.route_long_name} &#x${route.x_route_icon};&#xfe0e;`);
 			}
 		});
 	}
@@ -152,7 +152,7 @@ class GTFS extends Worker {
 			});
 		}
 		this.polylines[shape.shape_id].setOptions({
-			strokeColor: shape.route_color || '#008800',
+			strokeColor: `#${shape.route_color || '008800'}`,
 			zIndex: ((route_type) => {
 				switch (route_type) {
 					case '0': // Tram, Streetcar, Light rail
@@ -277,64 +277,65 @@ yodasws.page('home').setRoute({
 	// Load and Display Google Maps
 	const geocoder = new google.maps.Geocoder();
 	geocoder.geocode({ address: loc.search }, (results, status) => {
-		if (status == 'OK') {
-			// Load Google Maps
-			gtfs.map = new google.maps.Map(document.getElementById('google-maps'), {
-				mapTypeId: google.maps.MapTypeId.ROADMAP,
-				gestureHandling: 'cooperative',
-				keyboardShortcuts: true,
-				disableDefaultUI: true,
-				scaleControl: true,
-				scrollWheel: true,
-				zoomControl: true,
-				maxZoom: 18,
-				minZoom: 9,
-				zoom: 11,
-				center: results[0].geometry.location,
-				restriction: {
-					latLngBounds: (() => {
-						if (loc.bounds) {
-							return loc.bounds;
-						}
-						const bounds = results[0].geometry.bounds;
-						if (bounds.Ua && bounds.La) {
-							return {
-								north: bounds.Ua.i,
-								east: bounds.La.i,
-								south: bounds.Ua.g,
-								west: bounds.La.g,
-							};
-						}
-						return {
-							north: bounds.northeast.lat,
-							east: bounds.northeast.lng,
-							south: bounds.southwest.lat,
-							west: bounds.southwest.lng,
-						};
-					})(),
-				},
-			});
-			gtfs.map.zoom = gtfs.map.getZoom();
-			gtfs.map.addListener('zoom_changed', (e) => {
-				// Make Lines Thicker for Easier Reading
-				if (gtfs.poly && typeof gtfs.poly === 'object') {
-					const weightAdjust = (gtfs.map.zoom >= 14 ? gtfs.map.zoom - 13 : 6 - Math.floor((gtfs.map.zoom - 1) / 2));
-					Object.values(gtfs.poly).forEach((poly) => {
-						if (!gtfs.poly[i].Polyline) return;
-						poly.Polyline.setOptions({
-							strokeWeight: poly.weight + weightAdjust,
-						});
-					});
-				}
-			});
-			const loadHandler = gtfs.map.addListener('tilesloaded', () => {
-				gtfs.enlargeExtremes(gtfs.map.getBounds());
-				google.maps.event.removeListener(loadHandler);
-			});
-		} else {
+		if (status !== 'OK') {
 			showNoGoogleError();
 			console.error('Sam, Geocoder failed,', status);
+			return;
 		}
+		// Load Google Maps
+		gtfs.map = new google.maps.Map(document.getElementById('google-maps'), {
+			mapTypeId: google.maps.MapTypeId.ROADMAP,
+			gestureHandling: 'cooperative',
+			keyboardShortcuts: true,
+			disableDefaultUI: true,
+			scaleControl: true,
+			scrollWheel: true,
+			zoomControl: true,
+			maxZoom: 18,
+			minZoom: 9,
+			zoom: 11,
+			center: results[0].geometry.location,
+			restriction: {
+				latLngBounds: (() => {
+					if (loc.bounds) {
+						return loc.bounds;
+					}
+					const bounds = results[0].geometry.bounds;
+					if (bounds.Ua && bounds.La) {
+						return {
+							north: bounds.Ua.i,
+							east: bounds.La.i,
+							south: bounds.Ua.g,
+							west: bounds.La.g,
+						};
+					}
+					return {
+						north: bounds.northeast.lat,
+						east: bounds.northeast.lng,
+						south: bounds.southwest.lat,
+						west: bounds.southwest.lng,
+					};
+				})(),
+			},
+		});
+		gtfs.map.zoom = gtfs.map.getZoom();
+		gtfs.map.addListener('zoom_changed', (e) => {
+			// Make Lines Thicker for Easier Reading
+			if (gtfs.poly && typeof gtfs.poly === 'object') {
+				const weightAdjust = (gtfs.map.zoom >= 14 ? gtfs.map.zoom - 13 : 6 - Math.floor((gtfs.map.zoom - 1) / 2));
+				Object.values(gtfs.poly).forEach((poly) => {
+					if (!gtfs.poly[i].Polyline) return;
+					poly.Polyline.setOptions({
+						strokeWeight: poly.weight + weightAdjust,
+					});
+				});
+			}
+		});
+		const loadHandler = gtfs.map.addListener('tilesloaded', () => {
+			// console.log('Sam, bounds, getting bounds');
+			gtfs.enlargeExtremes(gtfs.map.getBounds());
+			google.maps.event.removeListener(loadHandler);
+		});
 	});
 
 	return;
