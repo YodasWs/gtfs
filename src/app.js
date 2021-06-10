@@ -166,7 +166,7 @@ class GTFS extends Worker {
 
 yodasws.page('home').setRoute({
 	template: 'pages/home.html',
-	route: '/([a-z]{2}/(\\w+/)?)?',
+	route: '/([a-z]{2}/([\\w-]+/)?)?',
 }).on('load', () => {
 	// Require Web Workers
 	if (!window.Worker) {
@@ -200,6 +200,16 @@ yodasws.page('home').setRoute({
 				search: 'Charlotte, NC, USA',
 				title: 'Charlotte',
 				files: 'us/charlotte',
+			},
+			'us/nyc-subway': {
+				search: 'New York, NY, USA',
+				title: 'New York Subway',
+				files: 'us/nyc-subway',
+			},
+			'us/nyc-bus': {
+				search: 'New York, NY, USA',
+				title: 'New York Buses',
+				files: 'us/nyc-bus',
 			},
 		};
 		if (locs[loc]) {
