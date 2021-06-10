@@ -7,7 +7,7 @@ function csv(str) {
 		// https://stackoverflow.com/questions/8493195/how-can-i-parse-a-csv-string-with-javascript-which-contains-comma-in-data
 		let cells = row.match(/(?!\s+$)\s*('([^'\\]*(?:\\[\S\s][^'\\]*)*)'|"([^"\\]*(?:\\[\S\s][^"\\]*)*)"|([^,'"\s\\]*(?:\s+[^,'"\s\\]+)*))\s*(?:,|$)/g);
 		if (Array.isArray(cells)) {
-			cells = cells.map(t => t.trim(',"'));
+			cells = cells.map(t => t.trim().trim(',"').trim());
 		}
 		return cells;
 	});
@@ -49,30 +49,57 @@ globalThis.gtfs = {
 	extremes: { north: -90, south: 180, east: -180, west: 180 },
 	routes: {},
 	shapes: {},
+	stops: {},
+	trips: {},
 
 	tripRoute: {},
-	stops: {},
 	poly: {},
+
+	updateRoute(route_id, route = null) {
+		this.routes[route_id] = {
+			...this.routes[route_id],
+			...route,
+			route_id,
+		};
+	},
 
 	updateShape(shape_id, shape = null) {
 		this.shapes[shape_id] = {
 			...this.shapes[shape_id],
 			...shape,
+			shape_id,
 		};
 		postMessage(['drawPolyline', this.shapes[shape_id]]);
 	},
 
+	updateTrip(trip_id, trip = null) {
+		this.trips[trip_id] = {
+			...this.trips[trip_id],
+			...trip,
+			trip_id,
+		};
+	},
+
 	addRouteToShape(shape_id, route_id) {
+		// Add route to shape
 		if (this.shapes[shape_id] === null || typeof this.shapes[shape_id] !== 'object') {
 			this.updateShape(shape_id);
 		}
-		if (!(this.shapes[shape_id].routes instanceof Set)) {
-			this.shapes[shape_id].routes = new Set();
+		const shape = this.shapes[shape_id];
+		if (!(shape.routes instanceof Set)) {
+			shape.routes = new Set();
 		}
-		if (this.routes[route_id]) {
-			this.shapes[shape_id].routes.add(route_id);
-			console.log('Sam, route:', this.routes[route_id]);
+		shape.routes.add(route_id);
+		// Add shape to route
+		if (this.routes[route_id] === null || typeof this.routes[route_id] !== 'object') {
+			this.updateRoute(route_id);
 		}
+		const route = this.routes[route_id];
+		if (!(route.shapes instanceof Set)) {
+			route.shapes = new Set();
+		}
+		route.shapes.add(shape_id);
+		// console.log('Sam, shape-route:', shape_id, route_id);
 	},
 
 	// Load and Draw GTFS Shapes
@@ -81,13 +108,17 @@ globalThis.gtfs = {
 		ajax({
 			url: `/gtfs/${url}/agency.txt`,
 		}).then((agencies) => {
+			setTimeout(() => {
 			console.log('Sam, agencies:', agencies);
 			postMessage(['listAgencies', agencies]);
+			this.loadedFiles = 'agency.txt';
+			}, Math.random() * 1000);
 		});
 
 		ajax({
 			url: `/gtfs/${url}/routes.txt`,
 		}).then((routes) => {
+			setTimeout(() => {
 			// Sort routes by type then number/name
 			routes.sort((a, b) => {
 				if (a.route_type !== b.route_type) {
@@ -110,7 +141,7 @@ globalThis.gtfs = {
 				return 0;
 			}).forEach((route) => {
 				// Set Route Icon (emoji)
-				if (!route.x_route_icon) {
+				if (typeof route.x_route_icon !== 'string' || route.x_route_icon === '') {
 					switch (route.route_type) {
 						case '0':
 							route.x_route_icon = '1f688';
@@ -141,32 +172,40 @@ globalThis.gtfs = {
 							break;
 						case '12':
 							route.x_route_icon = '1f69d';
+							break;
+						default:
+							route.x_route_icon = '1f68d';
 					}
 				}
-				route.x_route_icon = `&#x${route.x_route_icon || '1f68d'};`;
-				route.route_text_color = `#${route.route_text_color || '000000'}`;
-				route.route_color = `#${route.route_color || 'ffffff'}`;
 				route.stops = [];
-				this.routes[route.route_id] = route;
+				this.updateRoute(route.route_id, route);
 			});
-			console.log('Sam, routes:', routes);
+			// console.log('Sam, this.routes:', this.routes);
 			postMessage(['listRoutes', routes]);
+			this.loadedFiles = 'routes.txt';
+			}, Math.random() * 1000);
 		});
 
 		ajax({
 			url: `/gtfs/${url}/trips.txt`,
 		}).then((trips) => {
-			console.log('Sam, trips:', trips);
+			setTimeout(() => {
 			trips.forEach((trip) => {
-				this.addRouteToShape(trip.shape_id, trip.route_id);
+				if (typeof trip.shape_id === 'string' && trip.shape_id !== '') {
+					this.addRouteToShape(trip.shape_id, trip.route_id);
+				}
+				this.updateTrip(trip.trip_id, trip);
 			});
+			// console.log('Sam, this.trips:', this.trips);
+			this.loadedFiles = 'trips.txt';
+			}, Math.random() * 1000);
 		});
 
 		// Load and draw shapes
 		ajax({
 			url: `/gtfs/${url}/shapes.txt`,
 		}).then((shapes) => {
-			console.log('Sam, shapes:', shapes);
+			setTimeout(() => {
 			const points = {};
 			shapes.forEach((point) => {
 				points[point.shape_id] ??= [];
@@ -182,20 +221,43 @@ globalThis.gtfs = {
 					path,
 				});
 			});
+			this.loadedFiles = 'shapes.txt';
+			// console.log('Sam, this.shapes:', this.shapes);
+			}, Math.random() * 1000);
 		});
 
-		// TODO: Load names of stops
+		// Load stops information
 		ajax({
 			url: `/gtfs/${url}/stops.txt`,
 		}).then((stops) => {
-			console.log('Sam, stops:', stops);
+			setTimeout(() => {
+			stops.forEach((stop) => {
+				this.stops[stop.stop_id] = stop;
+			});
+			// console.log('Sam, this.stops:', this.stops);
+			this.loadedFiles = 'stops.txt';
+			}, Math.random() * 1000);
 		});
 
-		// TODO: Add stops to routes/trips
+		// Add stops to routes/trips
 		ajax({
 			url: `/gtfs/${url}/stop_times.txt`,
 		}).then((stop_times) => {
-			console.log('Sam, stop_times:', stop_times);
+			setTimeout(() => {
+			// console.log('Sam, stop_times:', stop_times);
+			const trips = {};
+			stop_times.forEach((st) => {
+				if (trips[st.trip_id] === null || typeof trips[st.trip_id] !== 'object') {
+					trips[st.trip_id] = {
+						trip_id: st.trip_id,
+						stops: [],
+					};
+				}
+				trips[st.trip_id].stops.push(st);
+			});
+				Object.values(trips).forEach((trip) => {
+					this.updateTrip(trip.trip_id, trip);
+				});
 
 			/*
 				// TODO: List stops along route
@@ -224,6 +286,8 @@ globalThis.gtfs = {
 					this.poly[route.shape].Polyline.setMap(this.map);
 				}
 			/**/
+			this.loadedFiles = 'stop_times.txt';
+			}, Math.random() * 1000);
 		});
 
 		// TODO: Cache txt files in Cache
@@ -487,6 +551,58 @@ globalThis.gtfs = {
 		$(document).trigger($.Event('loaded', { file: 'trips.txt', locale }));
 	},
 };
+
+(() => {
+	const loadedFiles = new Set();
+	Object.defineProperties(gtfs, {
+		loadedFiles: {
+			get() {
+				return loadedFiles;
+			},
+			set(value) {
+				loadedFiles.add(value);
+				console.log('Sam, loadedFiles add', value);
+
+				// Routes and Shapes have been linked, update Shape with Route information
+				if (loadedFiles.has('routes.txt') && loadedFiles.has('trips.txt')) {
+					Object.entries(this.shapes).forEach(([shape_id, shape]) => {
+						const newShape = {
+							route_color: undefined,
+							route_type: undefined,
+						};
+						if (!(shape.routes instanceof Set)) {
+							shape.routes = new Set();
+						}
+						shape.routes.forEach((route_id) => {
+							const route = this.routes[route_id];
+							if (typeof route.route_color === 'string' && route.route_color !== '') {
+								console.log('Sam, route_color:', route.route_color);
+								newShape.route_color = route.route_color;
+							} else {
+								console.log('Sam, route', route.route_id, 'has no color?!');
+							}
+							if (typeof route.route_type === 'string' && route.route_type !== '') {
+								newShape.route_type = route.route_type;
+							}
+						});
+						this.updateShape(shape_id, newShape);
+					});
+				}
+
+				if ([
+					'stop_times.txt',
+					'routes.txt',
+					'trips.txt',
+					'stops.txt',
+				].every((file) => loadedFiles.has(file))) {
+					// console.log('Sam, we are ready to draw routes based on stops, this.trips:', this.trips);
+					// console.log('Sam, we are ready to draw routes based on stops, this.routes:', this.routes);
+					// console.log('Sam, we are ready to draw routes based on stops, this.stops:', this.stops);
+				}
+			},
+		},
+	});
+})();
 
 onmessage = (e) => {
 	const [fn, ...args] = e.data;

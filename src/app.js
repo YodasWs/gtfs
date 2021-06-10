@@ -90,17 +90,23 @@ class GTFS extends Worker {
 		if (!(main instanceof Element)) {
 			return;
 		}
-		const el = document.createElement('section');
-		el.classList.add('agency');
+
+		let section = document.querySelector('section.agency');
+		if (!(section instanceof Element)) {
+			section = document.createElement('section');
+			section.classList.add('agency');
+		}
+
 		agencies.forEach((agency) => {
-			if (!agency || agency.agency_id == '') return;
-			el.insertAdjacentHTML('beforeend', `<h1>${agency.agency_name}`);
+			if (typeof agency !== 'object' || agency === null || !agency.agency_id) {
+				return;
+			}
+			section.insertAdjacentHTML('beforeend', `<h1>${agency.agency_name}`);
 			if (agency.agency_url) {
-				el.insertAdjacentHTML('beforeend', `<a href="${agency.agency_url}" target="_blank">Agency Website`);
+				section.insertAdjacentHTML('beforeend', `<a href="${agency.agency_url}" target="_blank">Agency Website`);
 			}
 		});
-		[...document.querySelectorAll('main section.agency')].forEach(s => s.remove());
-		main.appendChild(el);
+		main.appendChild(section);
 	}
 
 	listRoutes(routes) {
@@ -111,7 +117,6 @@ class GTFS extends Worker {
 		if (!(main instanceof Element)) {
 			return;
 		}
-		[...document.querySelectorAll('section[data-route-id]')].forEach(el => el.remove());
 
 		routes.forEach((route) => {
 			let section = document.querySelector(`section[data-route-id="${route.route_id}"]`);
