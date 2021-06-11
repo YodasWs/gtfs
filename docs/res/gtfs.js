@@ -108,7 +108,7 @@ globalThis.gtfs = {
 			url: `/gtfs/${url}/agency.txt`,
 		}).then((agencies) => {
 			setTimeout(() => {
-			console.log('Sam, agencies:', agencies);
+			// console.log('Sam, agencies:', agencies);
 			postMessage(['listAgencies', agencies]);
 			this.loadedFiles = 'agency.txt';
 			}, Math.random() * 1000);
@@ -577,10 +577,7 @@ globalThis.gtfs = {
 						shape.routes.forEach((route_id) => {
 							const route = this.routes[route_id];
 							if (typeof route.route_color === 'string' && route.route_color !== '') {
-								console.log('Sam, route_color:', route.route_color);
 								newShape.route_color = route.route_color;
-							} else {
-								console.log('Sam, route', route.route_id, 'has no color?!');
 							}
 							if (typeof route.route_type === 'string' && route.route_type !== '') {
 								newShape.route_type = route.route_type;
@@ -634,7 +631,32 @@ globalThis.gtfs = {
 					'trips.txt',
 					'stops.txt',
 				].every((file) => loadedFiles.has(file))) {
+					const routesWithStops = {};
+					Object.values(this.trips).forEach((trip) => {
+						if (trip.route_id !== 'Q') return; // Sam,
+						const route = this.routes[trip.route_id];
+						if (route.shapes instanceof Set && route.shapes.size > 0) {
+							// Route already has a route, ignore it
+							return;
+						}
+						console.log('Sam, trip', trip, 'has no shape');
+						if (!Array.isArray(routesWithStops[trip.route_id])) {
+							routesWithStops[trip.route_id] = [];
+						}
+						routesWithStops[trip.route_id] = routesWithStops[trip.route_id].concat(trip.stops);
+					});
 					// console.log('Sam, we are ready to draw routes based on stops, this.trips:', this.trips);
+					Object.entries(routesWithStops).forEach(([route_id, stops]) => {
+						const setStopIds = new Set();
+						routesWithStops[route_id] = stops.filter((stop) => {
+							if (setStopIds.has(stop.stop_id)) {
+								return false;
+							}
+							setStopIds.add(stop.stop_id);
+							return true;
+						});
+					});
+					console.log('Sam, routesWithStops:', routesWithStops);
 					// console.log('Sam, we are ready to draw routes based on stops, this.routes:', this.routes);
 					// console.log('Sam, we are ready to draw routes based on stops, this.stops:', this.stops);
 				}

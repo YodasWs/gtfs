@@ -137,7 +137,6 @@ class GTFS extends Worker {
 	}
 
 	zoomChangePolylines() {
-		console.log('Sam, zoomChangePolylines, zoom:', this.map.zoom);
 		let opacityAdjust = 1;
 		let weightAdjust = 0;
 		if (this.map.zoom >= 10) {
@@ -153,7 +152,6 @@ class GTFS extends Worker {
 		if (this.map.zoom >= 16) {
 			weightAdjust = this.map.zoom - 14;
 		}
-		console.log('Sam, zoom change, weightAdjust:', weightAdjust);
 		Object.entries(this.shapes).forEach(([shape_id, shape]) => {
 			if (this.polylines[shape.shape_id] instanceof google.maps.Polyline) {
 				this.polylines[shape.shape_id].setOptions({
@@ -356,7 +354,6 @@ yodasws.page('home').setRoute({
 		gtfs.map.addListener('zoom_changed', (e) => {
 			// Make Lines Thicker for Easier Reading
 			if (gtfs.polylines && typeof gtfs.polylines === 'object') {
-				console.log('Sam, zoom_changed and we have polylines');
 				gtfs.zoomChangePolylines();
 			}
 		});
