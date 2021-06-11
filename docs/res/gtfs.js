@@ -56,6 +56,8 @@ globalThis.gtfs = {
 
 	updateRoute(route_id, route = null) {
 		this.routes[route_id] = {
+			shapes: new Set(),
+			trips: new Set(),
 			...this.routes[route_id],
 			...route,
 			route_id,
@@ -64,6 +66,8 @@ globalThis.gtfs = {
 
 	updateShape(shape_id, shape = null) {
 		this.shapes[shape_id] = {
+			routes: new Set(),
+			trips: new Set(),
 			...this.shapes[shape_id],
 			...shape,
 			shape_id,
@@ -79,26 +83,25 @@ globalThis.gtfs = {
 		};
 	},
 
-	addRouteToShape(shape_id, route_id) {
-		// Add route to shape
-		if (this.shapes[shape_id] === null || typeof this.shapes[shape_id] !== 'object') {
-			this.updateShape(shape_id);
-		}
-		const shape = this.shapes[shape_id];
-		if (!(shape.routes instanceof Set)) {
-			shape.routes = new Set();
-		}
-		shape.routes.add(route_id);
-		// Add shape to route
+	linkRouteShapeTrip(route_id, shape_id, trip_id) {
+		// Link Route to Trip
 		if (this.routes[route_id] === null || typeof this.routes[route_id] !== 'object') {
 			this.updateRoute(route_id);
 		}
 		const route = this.routes[route_id];
-		if (!(route.shapes instanceof Set)) {
-			route.shapes = new Set();
+		route.trips.add(trip_id);
+
+		// Find and link Shape
+		if (typeof shape_id === 'string' && shape_id !== '') {
+			// Get Shape
+			if (this.shapes[shape_id] === null || typeof this.shapes[shape_id] !== 'object') {
+				this.updateShape(shape_id);
+			}
+			const shape = this.shapes[shape_id];
+			route.shapes.add(shape_id);
+			shape.routes.add(route_id);
+			shape.trips.add(trip_id);
 		}
-		route.shapes.add(shape_id);
-		// console.log('Sam, shape-route:', shape_id, route_id);
 	},
 
 	// Load and Draw GTFS Shapes
@@ -176,7 +179,6 @@ globalThis.gtfs = {
 							route.x_route_icon = '1f68d';
 					}
 				}
-				route.stops = [];
 				this.updateRoute(route.route_id, route);
 			});
 			// console.log('Sam, this.routes:', this.routes);
@@ -190,12 +192,11 @@ globalThis.gtfs = {
 		}).then((trips) => {
 			setTimeout(() => {
 			trips.forEach((trip) => {
-				if (typeof trip.shape_id === 'string' && trip.shape_id !== '') {
-					this.addRouteToShape(trip.shape_id, trip.route_id);
-				}
+				this.linkRouteShapeTrip(trip.route_id, trip.shape_id, trip.trip_id);
 				this.updateTrip(trip.trip_id, trip);
 			});
-			// console.log('Sam, this.trips:', this.trips);
+			console.log('Sam, this.trips:', this.trips);
+			console.log('Sam, route Q:', this.routes['Q']);
 			this.loadedFiles = 'trips.txt';
 			}, Math.random() * 1000);
 		});
@@ -626,12 +627,12 @@ globalThis.gtfs = {
 				}
 
 				if ([
-					'stop_times.txt',
-					'routes.txt',
-					'trips.txt',
-					'stops.txt',
+					'stop_times.txt', // List of stops for each trip
+					// 'stops.txt', // Stop information
+					'trips.txt', // Connects routes to pre-defined shapes
+					// 'routes.txt', // TODO: Do we need this?
 				].every((file) => loadedFiles.has(file))) {
-					const routesWithStops = {};
+					const longestTripPerRoute = {};
 					Object.values(this.trips).forEach((trip) => {
 						if (trip.route_id !== 'Q') return; // Sam,
 						const route = this.routes[trip.route_id];
@@ -640,23 +641,16 @@ globalThis.gtfs = {
 							return;
 						}
 						console.log('Sam, trip', trip, 'has no shape');
-						if (!Array.isArray(routesWithStops[trip.route_id])) {
-							routesWithStops[trip.route_id] = [];
+						if (!Array.isArray(longestTripPerRoute[trip.route_id])) {
+							longestTripPerRoute[trip.route_id] = [];
 						}
-						routesWithStops[trip.route_id] = routesWithStops[trip.route_id].concat(trip.stops);
+						if (Array.isArray(trip.stops) && trip.stops.length > longestTripPerRoute[trip.route_id].length) {
+							longestTripPerRoute[trip.route_id] = trip.stops;
+						}
 					});
+					console.log('Sam, longest Trip for Q:', longestTripPerRoute['Q']);
 					// console.log('Sam, we are ready to draw routes based on stops, this.trips:', this.trips);
-					Object.entries(routesWithStops).forEach(([route_id, stops]) => {
-						const setStopIds = new Set();
-						routesWithStops[route_id] = stops.filter((stop) => {
-							if (setStopIds.has(stop.stop_id)) {
-								return false;
-							}
-							setStopIds.add(stop.stop_id);
-							return true;
-						});
-					});
-					console.log('Sam, routesWithStops:', routesWithStops);
+					// TODO: Call updateShape with new shape ?
 					// console.log('Sam, we are ready to draw routes based on stops, this.routes:', this.routes);
 					// console.log('Sam, we are ready to draw routes based on stops, this.stops:', this.stops);
 				}
