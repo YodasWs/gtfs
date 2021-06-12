@@ -16,7 +16,12 @@ $col4: "(min-width: 1000px)";
 		margin-bottom: 0.5rem;
 	}
 
-	> #google-maps {
+	%box {
+		flex-basis: 100%;
+		border: 1px solid grey;
+	}
+
+	> #google-maps:not([hidden]) {
 		min-height: 400px;
 		flex-basis: 100%;
 		align-self: stretch;
@@ -24,8 +29,9 @@ $col4: "(min-width: 1000px)";
 	}
 
 	> section {
-		border: 1px solid grey;
+		@extend %box;
 		padding: 2px 1rem 1rem;
+		flex-grow: 1;
 
 		> h1 {
 			margin: 0.5rem 0;
@@ -96,6 +102,14 @@ $col4: "(min-width: 1000px)";
 		}
 	}
 
+	> .error {
+		@extend %box;
+		flex-basis: 100%;
+		order: 900;
+		border: 3px solid red;
+		padding: 0.6rem 1rem;
+	}
+
 	> footer {
 		flex-basis: 100%;
 		font-size: 0.8em;
@@ -111,7 +125,7 @@ $col4: "(min-width: 1000px)";
 		flex-flow: row wrap;
 		align-items: flex-start;
 
-		> section {
+		%box {
 			flex-basis: calc((100% - 1 * #{$gap}) / 2);
 		}
 	}
@@ -119,7 +133,7 @@ $col4: "(min-width: 1000px)";
 	@media #{$col3} {
 		justify-content: space-between;
 
-		> #google-maps {
+		> #google-maps:not([hidden]) {
 			flex-basis: 70%;
 
 			~ section:first-of-type {
@@ -127,13 +141,13 @@ $col4: "(min-width: 1000px)";
 			}
 		}
 
-		> section {
+		%box {
 			flex-basis: calc((100% - 2 * #{$gap}) / 3);
 		}
 	}
 
 	@media #{$col4} {
-		> section {
+		%box {
 			flex-basis: calc((100% - 3 * #{$gap}) / 4);
 		}
 	}
