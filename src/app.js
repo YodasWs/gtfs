@@ -1,11 +1,5 @@
 /* app.json */
-function setTitleError() {
-	const h2 = document.querySelector('main > h2');
-	if (!(h2 instanceof Element)) return;
-	h2.innerHTML = 'Error';
-}
 function showNoGoogleError() {
-	setTitleError();
 	[...document.querySelectorAll('.no-google')].forEach((div) => {
 		div.removeAttribute('hidden');
 	});
@@ -14,7 +8,6 @@ function showNoGoogleError() {
 	});
 }
 function showNoWorkerError() {
-	setTitleError();
 	[...document.querySelectorAll('.no-workers')].forEach((div) => {
 		div.removeAttribute('hidden');
 	});
@@ -250,22 +243,24 @@ yodasws.page('home').setRoute({
 			'jp/hakone': {
 				search: 'Hakone, Japan',
 				title: 'Hakone, Japan',
-				files: 'jp/hakone',
+				files: [
+					'jp/hakone',
+				],
 			},
 			'us/charlotte': {
 				search: 'Charlotte, NC, USA',
 				title: 'Charlotte',
-				files: 'us/charlotte',
+				files: [
+					'us/charlotte',
+				],
 			},
-			'us/nyc-subway': {
-				search: 'New York, NY, USA',
-				title: 'New York Subway',
-				files: 'us/nyc-subway',
-			},
-			'us/nyc-bus': {
-				search: 'New York, NY, USA',
-				title: 'New York Buses',
-				files: 'us/nyc-bus',
+			'us/new-york': {
+				search: 'New York City',
+				title: 'New York City',
+				files: [
+					'us/nyc-subway',
+					'us/nyc-bus',
+				],
 			},
 		};
 		if (locs[loc]) {
@@ -279,10 +274,12 @@ yodasws.page('home').setRoute({
 		return;
 	}
 
-	gtfs.postMessage([
-		'loadGTFS',
-		loc.files,
-	]);
+	loc.files.forEach((feed) => {
+		gtfs.postMessage([
+			'loadGTFS',
+			feed,
+		]);
+	});
 
 	(() => {
 		// Show Page to User
@@ -296,7 +293,7 @@ yodasws.page('home').setRoute({
 	})();
 
 	// Require Google Maps JavaScript API
-	if (!google || !google.maps) {
+	if (typeof google !== 'object' || google === null || typeof google.maps !== 'object' || google.maps === null) {
 		showNoGoogleError();
 		return;
 	}
