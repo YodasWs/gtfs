@@ -102,6 +102,11 @@ $col4: "(min-width: 1000px)";
 		padding: 0;
 		order: 3;
 
+		> h1,
+		> h2 {
+			cursor: pointer;
+		}
+
 		&.highlighted {
 			order: 2;
 		}
@@ -146,10 +151,6 @@ $col4: "(min-width: 1000px)";
 
 		> #google-maps:not([hidden]) {
 			flex-basis: 70%;
-
-			~ section:first-of-type {
-				flex-basis: calc(30% - #{$gap});
-			}
 		}
 
 		%box {

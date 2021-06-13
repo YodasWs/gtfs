@@ -130,6 +130,34 @@ class GTFS extends Worker {
 				section.insertAdjacentHTML('beforeend', `<div>${route.route_desc}`);
 			}
 		});
+
+		[...document.querySelectorAll('section[data-route-id] > h1, section[data-route-id] > h2')].forEach((section) => {
+			section.addEventListener('click', this.activateRoute.bind(this));
+		});
+	}
+
+	activateRoute(event) {
+		const section = event.target.closest('section[data-route-id]');
+		if (!(section instanceof Element)) return;
+		[...document.querySelectorAll('section[data-route-id].highlighted')].forEach(s => s.classList.remove('highlighted'));
+		section.classList.add('highlighted');
+		const route_id = section.getAttribute('data-route-id');
+		console.log('Sam, activateRoute:', route_id);
+		Object.entries(this.shapes).forEach(([shape_id, shape]) => {
+			shape.highlighted = false;
+			if (!shape.routes.has(route_id)) return;
+			shape.highlighted = true;
+			console.log('Sam, shape:', shape);
+			this.polylines[shape.shape_id].setOptions({
+				strokeWeight: 10,
+				opacity: 1,
+			});
+		});
+		this.zoomChangePolylines();
+		section.scrollIntoView({
+			behavior: 'smooth',
+			block: 'start',
+		});
 	}
 
 	zoomChangePolylines(shape = null) {
@@ -170,6 +198,7 @@ class GTFS extends Worker {
 				[shape.shape_id]: shape,
 			} : this.shapes
 		).forEach(([shape_id, shape]) => {
+			if (shape.highlighted) return;
 			if (this.polylines[shape.shape_id] instanceof google.maps.Polyline) {
 				let route_type = 'etc';
 				if (Number.parseInt(shape.route_type) >= 100) {
@@ -260,6 +289,7 @@ class GTFS extends Worker {
 		this.enlargeExtremes(bounds);
 	}
 
+	// Add Stops to Routes and Map
 	listStops(routes) {
 		Object.entries(routes).forEach(([route_id, stops]) => {
 			console.log('Sam, listStops:', route_id, stops);
