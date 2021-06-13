@@ -259,6 +259,27 @@ class GTFS extends Worker {
 		});
 		this.enlargeExtremes(bounds);
 	}
+
+	listStops(routes) {
+		Object.entries(routes).forEach(([route_id, stops]) => {
+			console.log('Sam, listStops:', route_id, stops);
+			let section = document.querySelector(`section[data-route-id="${route_id}"]`);
+			if (!(section instanceof Element)) {
+				console.error('Sam, route', route_id, 'not set?!');
+				return;
+			}
+			if (!Array.isArray(stops) || stops.length === 0) {
+				console.error('Sam, route', route_id, 'has no stops?!');
+				return;
+			}
+			[...section.querySelectorAll('ol')].forEach(list => list.remove());
+			const list = document.createElement('ol');
+			stops.forEach((stop) => {
+				list.insertAdjacentHTML('beforeend', `<li>${stop.stop_name}`);
+			});
+			section.appendChild(list);
+		});
+	}
 };
 
 yodasws.page('home').setRoute({
@@ -335,6 +356,7 @@ yodasws.page('home').setRoute({
 			el.removeAttribute('hidden');
 		});
 		// Set Page Title
+		yodasws.setPageTitle(loc.title);
 		const h2 = document.querySelector('main > h2');
 		if (!(h2 instanceof Element)) return;
 		h2.innerHTML = loc.title;
