@@ -16,9 +16,41 @@ $col4: "(min-width: 1000px)";
 		margin-bottom: 0.5rem;
 	}
 
+	$box-border: 1px solid black;
+
 	%box {
 		flex-basis: 100%;
-		border: 1px solid grey;
+		border: $box-border;
+
+		> h1,
+		> h2 {
+			text-align: center;
+			margin: -1px -1px 0;
+			border-right: $box-border;
+			border-left: $box-border;
+
+			&:first-child {
+				border-top: $box-border;
+			}
+		}
+
+		> h1 {
+			font-size: 1.5em;
+			padding: 2px 5px;
+
+			&:only-of-type {
+				text-align: center;
+			}
+
+			&:nth-of-type(n + 2) {
+				margin-top: 1rem;
+			}
+		}
+
+		> h2 {
+			font-size: 1.2em;
+			padding: 0 5px 5px;
+		}
 	}
 
 	> #google-maps:not([hidden]) {
@@ -33,16 +65,8 @@ $col4: "(min-width: 1000px)";
 		padding: 2px 1rem 1rem;
 		flex-grow: 1;
 
-		> h1 {
-			margin: 0.5rem 0;
-
-			&:only-of-type {
-				text-align: center;
-			}
-
-			&:nth-of-type(n + 2) {
-				margin-top: 1rem;
-			}
+		> div {
+			padding: 2px 5px;
 		}
 	}
 
@@ -51,6 +75,15 @@ $col4: "(min-width: 1000px)";
 
 		> * {
 			display: block;
+		}
+
+		> h1 {
+			margin: 0.5rem 0;
+			border: 0 none;
+
+			&:nth-of-type(n + 2) {
+				margin-top: 1rem;
+			}
 		}
 
 		> a[href] {
@@ -77,28 +110,6 @@ $col4: "(min-width: 1000px)";
 			flex-basis: 25%;
 			flex-grow: 1;
 			order: 1;
-		}
-
-		> h1,
-		> h2 {
-			text-align: center;
-			cursor: pointer;
-			margin: 0;
-		}
-
-		> h1 {
-			font-size: 1.5em;
-			padding: 2px 5px;
-		}
-
-		> h2 {
-			font-size: 1.2em;
-			padding: 0 5px 5px;
-		}
-
-		> h1 + h2 {
-			position: relative;
-			top: -1px;
 		}
 	}
 

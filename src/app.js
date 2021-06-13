@@ -121,10 +121,13 @@ class GTFS extends Worker {
 			main.appendChild(section);
 
 			if (route.route_short_name) {
-				section.insertAdjacentHTML('afterbegin', `<h2 style="background:#${route.route_color || 'ffffff'};color:#${route.route_text_color || '000000'}">&#x${route.x_route_icon};&#xfe0e; ${route.route_long_name}`);
-				section.insertAdjacentHTML('afterbegin', `<h1 style="background:#${route.route_color || 'ffffff'};color:#${route.route_text_color || '000000'}">&#x${route.x_route_icon};&#xfe0f; ${route.route_short_name}`);
+				section.insertAdjacentHTML('beforeend', `<h1 style="background:#${route.route_color || 'ffffff'};color:#${route.route_text_color || '000000'}">&#x${route.x_route_icon};&#xfe0f; ${route.route_short_name}`);
+				section.insertAdjacentHTML('beforeend', `<h2 style="background:#${route.route_color || 'ffffff'};color:#${route.route_text_color || '000000'}">&#x${route.x_route_icon};&#xfe0e; ${route.route_long_name}`);
 			} else {
-				section.insertAdjacentHTML('afterbegin', `<h1 style="background:#${route.route_color || 'ffffff'};color:#${route.route_text_color || '000000'}">&#x${route.x_route_icon};&#xfe0f; ${route.route_long_name} &#x${route.x_route_icon};&#xfe0e;`);
+				section.insertAdjacentHTML('beforeend', `<h1 style="background:#${route.route_color || 'ffffff'};color:#${route.route_text_color || '000000'}">&#x${route.x_route_icon};&#xfe0f; ${route.route_long_name} &#x${route.x_route_icon};&#xfe0e;`);
+			}
+			if (typeof route.route_desc === 'string' && route.route_desc !== '') {
+				section.insertAdjacentHTML('beforeend', `<div>${route.route_desc}`);
 			}
 		});
 	}
@@ -138,7 +141,7 @@ class GTFS extends Worker {
 				etc: 1,
 			},
 			weight: {
-				rail: 1,
+				rail: 0,
 				bus: 0,
 				etc: 0,
 			},
@@ -148,6 +151,9 @@ class GTFS extends Worker {
 			[7, 'bus'],
 		]);
 		let opacityAdjust = 1;
+		if (this.map.zoom >= 10) {
+			adjust.weight.rail = 1;
+		}
 		if (this.map.zoom >= 12) {
 			adjust.weight.rail = 2;
 		}
