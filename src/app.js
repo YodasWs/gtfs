@@ -183,9 +183,11 @@ class GTFS extends Worker {
 						return 8;
 					case '1': // Metro, Subway
 						return 9;
+					case '100': // Railway
 					case '2': // Rail
 						return 10;
 					case '704': // Local Bus
+					case '711': // Shuttle Bus
 					case '3': // Bus
 						return 0;
 					case '1400': // Funicular
