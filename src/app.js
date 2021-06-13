@@ -129,27 +129,56 @@ class GTFS extends Worker {
 		});
 	}
 
-	zoomChangePolylines() {
+	zoomChangePolylines(shape = null) {
+		// TODO: Use shape.route_type to further adjust weight and opacity
+		const adjust = {
+			opacity: {
+				rail: 1,
+				bus: 1,
+				etc: 1,
+			},
+			weight: {
+				rail: 1,
+				bus: 0,
+				etc: 0,
+			},
+		};
+		const routeTypeMap = new Map([
+			[1, 'rail'],
+			[7, 'bus'],
+		]);
 		let opacityAdjust = 1;
-		let weightAdjust = 0;
-		if (this.map.zoom >= 10) {
-			weightAdjust = 1;
-		}
-		if (this.map.zoom >= 11) {
-			weightAdjust = 6 - Math.floor((this.map.zoom - 1) / 2);
+		if (this.map.zoom >= 12) {
+			adjust.weight.rail = 2;
 		}
 		if (this.map.zoom >= 14) {
 			opacityAdjust = 1.5;
-			weightAdjust = this.map.zoom - 13;
+			adjust.weight.bus = this.map.zoom - 13;
+			adjust.weight.rail = this.map.zoom - 12;
 		}
 		if (this.map.zoom >= 16) {
-			weightAdjust = this.map.zoom - 14;
+			adjust.weight.bus = this.map.zoom - 14;
 		}
-		Object.entries(this.shapes).forEach(([shape_id, shape]) => {
+		Object.entries(
+			typeof shape === 'object' && shape !== null ? {
+				[shape.shape_id]: shape,
+			} : this.shapes
+		).forEach(([shape_id, shape]) => {
 			if (this.polylines[shape.shape_id] instanceof google.maps.Polyline) {
+				let route_type = 'etc';
+				if (Number.parseInt(shape.route_type) >= 100) {
+					const num = Math.floor(Number.parseInt(shape.route_type) / 100);
+					if (routeTypeMap.has(num)) route_type = routeTypeMap.get(num);
+				} else if (shape.route_type === '0') {
+					route_type = 'rail';
+				} else if (shape.route_type === '2') {
+					route_type = 'rail';
+				} else if (shape.route_type === '3') {
+					route_type = 'bus';
+				}
 				this.polylines[shape.shape_id].setOptions({
 					strokeOpacity: shape.opacity * opacityAdjust,
-					strokeWeight: shape.weight + weightAdjust,
+					strokeWeight: shape.weight + adjust.weight[route_type],
 				});
 			}
 		});
@@ -209,7 +238,7 @@ class GTFS extends Worker {
 			})(shape.route_type),
 			path: shape.path,
 		});
-		this.zoomChangePolylines();
+		this.zoomChangePolylines(shape);
 
 		let bounds = {
 			...this.extremes,
