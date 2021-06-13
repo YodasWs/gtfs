@@ -123,6 +123,28 @@ globalThis.gtfs = {
 				}
 				if (typeof route.route_type === 'string' && route.route_type !== '') {
 					newShape.route_type = route.route_type;
+					// First, 3-digit code
+					switch (Math.floor(Number.parseInt(route.route_type))) {
+						case 1: // Railway Service
+							newShape.opacity = 0.7;
+							newShape.weight = 3;
+							return;
+						case 7: // Bus Service
+							if (route.route_type === '701') {
+								// Regional Bus Service
+								newShape.weight = 2;
+								return;
+							}
+							if (route.route_type === '702') {
+								// Express Bus Service
+								newShape.opacity = 0.4;
+								newShape.weight = 2;
+								return;
+							}
+							// Local, Other Bus Service
+							newShape.opacity = 0.4;
+							return;
+					}
 					switch (route.route_type) {
 						case '0': // Tram, Streetcar, Light rail
 							newShape.opacity = 0.7;
@@ -132,13 +154,10 @@ globalThis.gtfs = {
 							newShape.opacity = 0.7;
 							newShape.weight = 2;
 							break;
-						case '100': // Railway
 						case '2': // Rail
 							newShape.opacity = 0.7;
 							newShape.weight = 3;
 							break;
-						case '704': // Local Bus
-						case '711': // Shuttle Bus
 						case '3': // Bus
 							newShape.opacity = 0.4;
 							break;
@@ -150,6 +169,7 @@ globalThis.gtfs = {
 						case '5': // Cable Car
 							// newShape.weight = 2;
 							break;
+						case '1300': // Aerial Lift
 						case '6': // Gondola
 							newShape.opacity = 0.4;
 							newShape.weight = 2;
@@ -195,11 +215,20 @@ globalThis.gtfs = {
 					const a_num = Number.parseInt(a.route_type);
 					const b_num = Number.parseInt(b.route_type);
 					if (Number.isFinite(a_num) && Number.isFinite(b_num) && a_num !== b_num) {
+						const aIsBus = a_num === 3 || Math.floor(a_num / 100) === 7;
+						const bIsBus = b_num === 3 || Math.floor(b_num / 100) === 7;
 						if (a.route_short_name === '211' || b.route_short_name === '211')
 							console.log('Sam, 211, nums:', a_num, b_num);
-						if (Math.floor(a_num / 100) !== Math.floor(a_num / 100)) {
-							if (Math.floor(a_num / 100) == 7 || a_num === 3) return 1; // Bus Service
-							if (Math.floor(b_num / 100) == 7 || b_num === 3) return -1; // Bus Service
+						// Both buses, sort by code
+						if (aIsBus && bIsBus) {
+							return a_num - b_num;
+						}
+						// Bus is lowest priority
+						if (aIsBus !== bIsBus) {
+							if (aIsBus) return 1;
+							if (bIsBus) return -1;
+						}
+						if (Math.floor(a_num / 100) !== Math.floor(b_num / 100)) {
 							if (Math.floor(a_num / 100) == 8) return 1; // Trolleybus Service
 							if (Math.floor(b_num / 100) == 8) return -1; // Trolleybus Service
 							if (Math.floor(a_num / 100) == 2) return 1; // Coach Service
@@ -254,6 +283,7 @@ globalThis.gtfs = {
 						case '5': // Cable Car
 							route.x_route_icon = '1f683';
 							break;
+						case '1300': // Aerial Lift
 						case '6': // Gondola
 							route.x_route_icon = '1f6a0';
 							break;
