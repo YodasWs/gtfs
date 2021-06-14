@@ -26,6 +26,7 @@ class GTFS extends Worker {
 		};
 		this.polylines = {};
 		this.shapes = {};
+		this.stops = {};
 	}
 
 	enlargeExtremes(latlng) {
@@ -154,10 +155,13 @@ class GTFS extends Worker {
 			});
 		});
 		this.zoomChangePolylines();
-		section.scrollIntoView({
-			behavior: 'smooth',
-			block: 'start',
-		});
+		const elMap = document.querySelector('#google-maps');
+		if (elMap instanceof Element) {
+			elMap.scrollIntoView({
+				behavior: 'smooth',
+				block: 'center',
+			});
+		}
 	}
 
 	zoomChangePolylines(shape = null) {
@@ -239,38 +243,39 @@ class GTFS extends Worker {
 				map: this.map,
 			});
 		}
+		const zIndex = ((route_type) => {
+			switch (Math.floor(Number.parseInt(route_type) / 100)) {
+				case 1: // Railway
+					return 10;
+				case 7: // Bus Service
+					return 0;
+			}
+			switch (route_type) {
+				case '0': // Tram, Streetcar, Light rail
+					return 8;
+				case '1': // Metro, Subway
+					return 9;
+				case '2': // Rail
+					return 10;
+				case '3': // Bus
+					return 0;
+				case '1200': // Ferry Service
+				case '4': // Ferry
+					return 7;
+				case '1300': // Aerial Lift
+				case '6': // Aerial Lift
+					return 6;
+				case '1400': // Funicular
+				case '7': // Funicular
+					return 7;
+				case '12': // Monorail
+					return 9;
+			}
+			return 1;
+		})(shape.route_type);
 		this.polylines[shape.shape_id].setOptions({
 			strokeColor: `#${shape.route_color || '008800'}`,
-			zIndex: ((route_type) => {
-				switch (Math.floor(Number.parseInt(route_type) / 100)) {
-					case 1: // Railway
-						return 10;
-					case 7: // Bus Service
-						return 0;
-				}
-				switch (route_type) {
-					case '0': // Tram, Streetcar, Light rail
-						return 8;
-					case '1': // Metro, Subway
-						return 9;
-					case '2': // Rail
-						return 10;
-					case '3': // Bus
-						return 0;
-					case '1200': // Ferry Service
-					case '4': // Ferry
-						return 7;
-					case '1300': // Aerial Lift
-					case '6': // Aerial Lift
-						return 6;
-					case '1400': // Funicular
-					case '7': // Funicular
-						return 7;
-					case '12': // Monorail
-						return 9;
-				}
-				return 1;
-			})(shape.route_type),
+			zIndex,
 			path: shape.path,
 		});
 		this.zoomChangePolylines(shape);
