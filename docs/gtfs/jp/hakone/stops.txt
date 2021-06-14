@@ -6,26 +6,33 @@ stn-odawara-east,101,"Odawara Station, East Gate",35.2557317,139.1563618,2
 stn-hakone-itabashi,OH 48,Hakone-Itabashi Station,35.2451330,139.1452250,1
 stn-kazamatsuri,OH 49,Kazamatsuri,35.2462447,139.1291964,1
 stn-iriuda,OH 50,Iriuda Station,35.2407720,139.1210600,1
-stn-hakone-yumoto,OH 51,Hakone-yumoto Station,35.2335,139.1039,1
+stn-hakone-yumoto,OH 51,Hakone-Yumoto Station,35.2335,139.1039,1
 stn-tonosawa,OH 52,Tonosawa Station,35.2344380,139.0939520,1
 stn-ohiradai,OH 53,Ohiradai Station,35.2385760,139.0741200,1
 stn-miyanoshita,OH 54,Miyanoshita Station,35.2419920,139.0630100,1
 stn-kowakidani,OH 55,Kowakidani Station,35.2405760,139.0524830,1
 stn-chokoku,OH 56,Chokoku-no-mori Station,35.2464500,139.0508340,1
 stn-gora,OH 57,Gora Station,35.2508,139.0482,1
+stn-koenshima,OH 58,Koen-Shima Station,35.2499080,139.0457050,1
+stn-koenkami,OH 59,Koen-Kami Station,35.2490740,139.0432060,1
+stn-nakagora,OH 60,Naka-Gora Station,35.2481300,139.0405950,1
+stn-kamigora,OH 61,Kami-Gora Station,35.2472410,139.0381780,1
 stn-sounzan,OH 62,Sounzan Station,35.2464630,139.0355950,1
 stn-owakudani,OH 63,Owakudani Station,35.2442960,139.0200970,1
 stn-ubako,OH 64,Ubako Station,35.2445466,139.0059891,1
 togendai,OH 65,Togendai,35.2378800,138.9945710,1
 hakonemachi,OH 66,Hakonemachi,35.1896438,139.0255558,0
-stn-koenshima,,Koen-Shima Station,35.2499080,139.0457050,1
-stn-koenkami,,Koen-Kami Station,35.2490740,139.0432060,1
-stn-nakagora,,Naka-Gora Station,35.2481300,139.0405950,1
-stn-kamigora,,Kami-Gora Station,35.2472410,139.0381780,1
+motohakone-ko,OH 67,Motohakone-ko,35.2009123,139.0306655,0
 stn-haneda-intl-bus,,Haneda International Terminal,35.5444068,139.7677875,1
 stn-haneda-t1,,Haneda Terminal 1,35.5491032,139.7846156,1
 stn-haneda-t2,,Haneda Terminal 2,35.5507661,139.7881347,1
 tonosawa-hot-spr,,Tonosawa Onsen (Hot Spring),35.2327790,139.0928042,0
+midoricho,102,Midoricho,35.2541591,139.1584754,0
+honcho,106,Honcho,35.2477237,139.1579229,0
+hakoneguchi,108,Hakone-guchi,35.2472681,139.1556752,0
+sanmaibashi-east,120,Higashi-Sanmaibashi,35.2339226,139.1115904,0
+sanmaibashi,121,Sanmaibashi,35.2338919,139.1083181,0
+122,122,Hakone-Yumoto Station,35.23307564395176,139.1035451123956,0
 123,123,Onsenba-iriguchi (Hot spring bairiguchi),35.23169715373358,139.10115144899015,0
 tonosawa,124,Tonosawa,35.2327658,139.0952128,0
 deyama,126,Deyama,35.2336772,139.0866083,0
@@ -48,38 +55,48 @@ sengokuhara-shogakko,245,Sengokuhara-shogakko-mae,35.27065638986368,139.01283404
 sengoku,246,Sengoku,35.27305794717773,139.0114032251884,0
 sengoku-annaijo,247,Sengoku-annaijo-mae,35.27105422004356,139.01021115511924,0
 sengokukara-bunka,248,Sengokuhara Bunka Center-mae,35.26999630582975,139.01119061656578,0
+249,249,"Kawamukai / Little Prince Museum",35.266826947021244,139.01297046010714,0
 250,250,Senkyoro-mae,35.26422381890464,139.01391763799634,0
+251,251,Daigatake,35.26393062901887,139.01041405251118,0
 sengoku-kogen,252,Sengoku-kogen,35.2587248,139.0008205,0
+253,253,Tokyo Hoso-iriguchi,35.25457923591707,138.99937830561922,0
+254,254,Minami-Sengokuhara,35.2525840547341,138.998601326045,0
+255,255,Hakone Country-iriguchi,35.25152878281744,138.99871543208093,0
+256,256,Ubako-onsen-iriguchi,35.24868760418198,138.99845128368574,0
+257,257,Onsenso,35.2476215132455,138.99708881404658,0
+258,258,Palace Hotel Hakone-mae,35.24649761181286,138.99749042360597,0
+259,259,Minami-Onsenso,35.243848359974415,138.99931691660947,0
+hotel-hatsuhana,331,Hotel Hatsuhana-mae,35.2219400,139.0804000,0
+sukumogawa,332,Sukumogawa,35.2209825,139.0753859,0
+kami-sukumogawa,333,Kami-Sukumogawa,35.2197598,139.0725374,0
 343,343,Otamagaike,35.20551878954948,139.03907443933295,0
 344,344,Kyukaido-guchi,35.20572528057817,139.0355037865437,0
 hatajuku,336,Hatajuku,35.2120595,139.0627259,0
 kami-hatajuku,337,Kami-Hatajuku,35.2115598,139.0609074,0
 ninotaira,427,Ninotaira,35.2429177,139.0497923,0
-443,443,Hakone Garassu-no-mori-mae (Hakone Venetian Glass Museum),35.2666413003987,139.01751997618356,0
-hakone-garden,450,Shissei-kaen-mae (Hakone Botanical Garden of Wetlands),35.2673076,139.0064424,0
-pola-art,439,Pola Art Museum,35.2562880,139.0204167,0
+chokoku,428,"Chokoku-no-mori, Hakone Open Air Museum",35.2452528,139.0506721,0
 430,430,Hakone Yutowa-mae,35.2487313,139.0483975,0
+hakone-art,433,"Hakone-bijutsukan, Gora-koen (Hakone Museum of Art, Hakone Gora Park)",35.2486612,139.0434086,0
+434,434,Himeshara-rindo-iriguchi,35.252765688303064,139.0392352486859,0
+435,435,Komorebi-zaka,35.252132775775735,139.03510796327353,0
+436,436,Shimoyu-onsen,35.25321334940503,139.02784680705457,0
+437,437,Bangakuro-mae,35.25259212591889,139.0271625580686,0
+438,438,Yubanaka,35.25292338619562,139.0246481821098,0
+pola-art,439,Pola Art Museum,35.2562880,139.0204167,0
+440,440,Motoyu-onsen,35.26242412547646,139.01634575324593,0
+443,443,Hakone Garassu-no-mori-mae (Hakone Venetian Glass Museum),35.2666413003987,139.01751997618356,0
+448,448,"Hakone Lalique-bijutsukan (Lalique Museum Hakone)",35.27046103963194,139.00945935769965,0
+449,449,Ohara,35.269144887142595,139.00790155423917,0
+hakone-garden,450,Shissei-kaen-mae (Hakone Botanical Garden of Wetlands),35.2673076,139.0064424,0
 onsen-kaikan-mae,554,Onsen-kaikan-mae,35.2883642,138.9686018,0
 555,555,Fukasawa,35.2887171347194,138.96510089185134,0
 556,556,Higashiyama,35.29601795037108,138.95904216345338,0
+nino-oka-iriguchi,558,Nino-oka-iriguchi,35.2873921,138.9503789,0
 559,559,Nino-oka,35.289120935012086,138.94960828940916,0
 gotemba-outlets,563,Gotemba Premium Outlets&reg;,35.3074401,138.9621592,0
 tomei-gotemba,565,Tomei-Gotemba,35.2949408,138.9455187,0
 568,568,Gotemba Station (Hakone Otome exit),35.2999550,138.9342130,2
 839,839,Ten-yu,35.23878555999217,139.04424403243152,0
-chokoku,,"Chokoku-no-mori, Hakone Open Air Museum",35.2452528,139.0506721,0
-yama-no-hotel,,Odakyu Yama-no Hotel,35.2042633,139.0218437,0
-hakoneguchi,,Hakone-guchi,35.2472681,139.1556752,0
-honcho,,Honcho,35.2477237,139.1579229,0
-midoricho,,Midoricho,35.2541591,139.1584754,0
-nino-oka-iriguchi,,Nino-oka-iriguchi,35.2873921,138.9503789,0
-yama-no-hotel,,Odakyu Yama-no Hotel,35.2042546,139.0218222,0
-sukumogawa,,Sukumogawa,35.2209825,139.0753859,0
-kami-sukumogawa,,Kami-Sukumogawa,35.2197598,139.0725374,0
-hotel-hatsuhana,,Hotel-Hatsuhana,35.2219400,139.0804000,0
-hakone-art,,Hakone Art Museum,35.2486612,139.0434086,0
-motohakone-ko,,Motohakone-ko,35.2009123,139.0306655,0
-sanmaibashi,,Sanmaibashi,35.2338919,139.1083181,0
-sanmaibashi-east,,Higashi-Sanmaibashi,35.2339226,139.1115904,0
+yama-no-hotel,868,Odakyu Yama-no Hotel,35.2042633,139.0218437,0
 shimojuku,,Shimojuku,35.2322663,139.1085112,0
 yumoto-yubinkyoku,,Yumoto-Yubinkyoku-mae,35.2305443,139.1064298,0
