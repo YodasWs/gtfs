@@ -140,20 +140,37 @@ class GTFS extends Worker {
 	activateRoute(event) {
 		const section = event.target.closest('section[data-route-id]');
 		if (!(section instanceof Element)) return;
-		[...document.querySelectorAll('section[data-route-id].highlighted')].forEach(s => s.classList.remove('highlighted'));
+		// Unhighlight other routes
+		[...document.querySelectorAll('section[data-route-id].highlighted')].forEach((s) => {
+			const route_id = s.getAttribute('data-route-id');
+			if (typeof this.stops[route_id] === 'object' && this.stops[route_id] !== null) {
+				Object.entries(this.stops[route_id]).forEach(([stop_id, stop]) => {
+					stop.setMap(null);
+				});
+			}
+			s.classList.remove('highlighted');
+		});
 		section.classList.add('highlighted');
 		const route_id = section.getAttribute('data-route-id');
 		console.log('Sam, activateRoute:', route_id);
+		// Highlight route on map
 		Object.entries(this.shapes).forEach(([shape_id, shape]) => {
 			shape.highlighted = false;
 			if (!shape.routes.has(route_id)) return;
 			shape.highlighted = true;
 			console.log('Sam, shape:', shape);
 			this.polylines[shape.shape_id].setOptions({
+				strokeOpacity: 0.9,
 				strokeWeight: 10,
-				opacity: 1,
+				zIndex: 100,
 			});
 		});
+		// Update Map
+		if (typeof this.stops[route_id] === 'object' && this.stops[route_id] !== null) {
+			Object.entries(this.stops[route_id]).forEach(([stop_id, stop]) => {
+				stop.setMap(this.map);
+			});
+		}
 		this.zoomChangePolylines();
 		const elMap = document.querySelector('#google-maps');
 		if (elMap instanceof Element) {
@@ -308,9 +325,37 @@ class GTFS extends Worker {
 				return;
 			}
 			[...section.querySelectorAll('ol')].forEach(list => list.remove());
+			if (typeof this.stops[route_id] !== 'object' || this.stops[route_id] === null) {
+				this.stops[route_id] = {};
+			}
 			const list = document.createElement('ol');
 			stops.forEach((stop) => {
-				list.insertAdjacentHTML('beforeend', `<li>${stop.stop_name}`);
+				const li = document.createElement('li');
+				let title = stop.stop_name;
+				if (typeof stop.stop_code === 'string' && Number.isFinite(Number.parseInt(stop.stop_code))) {
+					title = `${stop.stop_code} ${stop.stop_name}`;
+					li.setAttribute('value', stop.stop_code);
+				}
+				li.innerHTML = stop.stop_name;
+				list.appendChild(li);
+				if (!(this.stops[route_id][stop.stop_id] instanceof google.maps.Marker)) {
+					this.stops[route_id][stop.stop_id] = new google.maps.Marker({
+						position: {
+							lat: Number.parseFloat(stop.stop_lat),
+							lng: Number.parseFloat(stop.stop_lon),
+						},
+						title,
+						icon: {
+							url: 'https://yodasws.github.io/gtfs/pins/icons8-tram-32.png',
+							scaledSize: new google.maps.Size(33 * 2 / 3, 44 * 2 / 3),
+						},
+						/*
+					label: {
+						text: stop.stop_sequence,
+					},
+						/**/
+					});
+				}
 			});
 			section.appendChild(list);
 		});
