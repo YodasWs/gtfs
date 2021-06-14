@@ -347,7 +347,8 @@ class GTFS extends Worker {
 						title,
 						icon: {
 							url: 'https://yodasws.github.io/gtfs/pins/icons8-tram-32.png',
-							scaledSize: new google.maps.Size(33 * 2 / 3, 44 * 2 / 3),
+							scaledSize: new google.maps.Size(22, 22),
+							anchor: { x: 11, y: 11 }
 						},
 						/*
 					label: {

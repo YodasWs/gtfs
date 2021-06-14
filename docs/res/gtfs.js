@@ -248,6 +248,7 @@ globalThis.gtfs = {
 				// Set Route Icon (emoji)
 				if (typeof route.x_route_icon !== 'string' || route.x_route_icon === '') {
 					switch (route.route_type) {
+						case '107': // Tourist Railway
 						case '0': // Tram, Streetcar, Light rail
 							route.x_route_icon = '1f688';
 							break;
@@ -315,7 +316,7 @@ globalThis.gtfs = {
 				this.linkRouteShapeTrip(trip.route_id, trip.shape_id, trip.trip_id);
 				this.updateTrip(trip.trip_id, trip);
 			});
-			console.log('Sam, this.trips:', this.trips);
+			// console.log('Sam, this.trips:', this.trips);
 			this.loadedFiles = 'trips.txt';
 			}, Math.random() * 1000);
 		});
@@ -663,6 +664,7 @@ globalThis.gtfs = {
 					'stop_times.txt', // List of stops for each trip
 					'stops.txt', // Stop information
 					'trips.txt', // Connects routes to pre-defined shapes
+					'routes.txt', // Defines the routes
 				].every((file) => loadedFiles.has(file))) {
 					// TODO: Take into account block_id
 					// TODO: For my hakone data, block_id means multiple shapes for one "route"
@@ -680,7 +682,9 @@ globalThis.gtfs = {
 
 					// Use longest trip to list stops and form new shape
 					Object.entries(longestTripPerRoute).forEach(([route_id, stops]) => {
+						if (!Array.isArray(stops) || stops.length === 0) return;
 						const route = this.routes[route_id];
+						if (typeof route !== 'object' || route === null) return;
 						const routeHasShape = route.shapes instanceof Set && route.shapes.size > 0;
 						const path = [];
 						stops.sort((a, b) => {
@@ -708,10 +712,6 @@ globalThis.gtfs = {
 							});
 						}
 					});
-					if (loadedFiles.has('routes.txt')) {
-						this.setShapesStroke();
-					}
-					// TODO: Do we need to require routes.txt?
 					postMessage(['listStops', longestTripPerRoute]);
 
 					// console.log('Sam, we are ready to draw routes based on stops, this.trips:', this.trips);
