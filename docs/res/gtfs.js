@@ -655,11 +655,6 @@ globalThis.gtfs = {
 				loadedFiles.add(value);
 				console.log('Sam, loadedFiles add', value);
 
-				// Routes and Shapes have been linked, update Shape with Route information
-				if (loadedFiles.has('routes.txt') && loadedFiles.has('trips.txt')) {
-					this.setShapesStroke();
-				}
-
 				if ([
 					'stop_times.txt', // List of stops for each trip
 					'stops.txt', // Stop information
@@ -713,11 +708,8 @@ globalThis.gtfs = {
 						}
 					});
 					postMessage(['listStops', longestTripPerRoute]);
-
-					// console.log('Sam, we are ready to draw routes based on stops, this.trips:', this.trips);
-					// TODO: Call updateShape with new shape ?
-					// console.log('Sam, we are ready to draw routes based on stops, this.routes:', this.routes);
-					// console.log('Sam, we are ready to draw routes based on stops, this.stops:', this.stops);
+					// Routes and Shapes have been linked, update Shape with Route information
+					this.setShapesStroke();
 				}
 			},
 		},
