@@ -24,6 +24,7 @@ class GTFS extends Worker {
 			east: -180,
 			west: 180,
 		};
+		this.eventAborts = new AbortController();
 		this.polylines = {};
 		this.shapes = {};
 		this.stops = {};
@@ -67,10 +68,13 @@ class GTFS extends Worker {
 
 		routes.forEach((route) => {
 			let section = document.querySelector(`section[data-route-id="${route.route_id}"]`);
-			if (!(section instanceof Element)) {
-				section = document.createElement('section');
-				section.setAttribute('data-route-id', route.route_id);
+			if (section instanceof Element && section.querySelector('h1') instanceof Element) {
+				// Route box already on page, move on
+				return;
 			}
+
+			section = document.createElement('section');
+			section.setAttribute('data-route-id', route.route_id);
 			main.appendChild(section);
 
 			if (route.route_short_name) {
@@ -84,14 +88,19 @@ class GTFS extends Worker {
 			}
 		});
 
+		this.eventAborts.abort();
+		this.eventAborts = new AbortController();
 		[...document.querySelectorAll('section[data-route-id] > h1, section[data-route-id] > h2')].forEach((section) => {
-			section.addEventListener('click', this.activateRoute.bind(this));
+			section.addEventListener('click', this.activateRoute.bind(this), {
+				signal: this.eventAborts.signal,
+			});
 		});
 	}
 
 	activateRoute(event) {
 		const section = event.target.closest('section[data-route-id]');
 		if (!(section instanceof Element)) return;
+		const unhighlight = section.classList.contains('highlighted');
 		// Unhighlight other routes
 		[...document.querySelectorAll('section[data-route-id].highlighted')].forEach((s) => {
 			const route_id = s.getAttribute('data-route-id');
@@ -102,34 +111,39 @@ class GTFS extends Worker {
 			}
 			s.classList.remove('highlighted');
 		});
-		section.classList.add('highlighted');
+		if (!unhighlight) {
+			section.classList.add('highlighted');
+		}
 		const route_id = section.getAttribute('data-route-id');
 		console.log('Sam, activateRoute:', route_id);
 		// Highlight route on map
 		Object.entries(this.shapes).forEach(([shape_id, shape]) => {
 			shape.highlighted = false;
 			if (!shape.routes.has(route_id)) return;
+			if (unhighlight) return;
 			shape.highlighted = true;
 			console.log('Sam, shape:', shape);
 			this.polylines[shape.shape_id].setOptions({
 				strokeOpacity: 0.9,
-				strokeWeight: 10,
+				strokeWeight: 9,
 				zIndex: 100,
 			});
 		});
 		// Update Map
-		if (typeof this.stops[route_id] === 'object' && this.stops[route_id] !== null) {
+		if (!unhighlight && typeof this.stops[route_id] === 'object' && this.stops[route_id] !== null) {
 			Object.entries(this.stops[route_id]).forEach(([stop_id, stop]) => {
 				stop.setMap(this.map);
 			});
 		}
 		this.zoomChangePolylines();
-		const elMap = document.querySelector('#google-maps');
-		if (elMap instanceof Element) {
-			elMap.scrollIntoView({
-				behavior: 'smooth',
-				block: 'center',
-			});
+		if (!unhighlight) {
+			const elMap = document.querySelector('#google-maps');
+			if (elMap instanceof Element) {
+				elMap.scrollIntoView({
+					behavior: 'smooth',
+					block: 'center',
+				});
+			}
 		}
 	}
 
@@ -259,7 +273,7 @@ class GTFS extends Worker {
 				return;
 			}
 			if (!Array.isArray(stops) || stops.length === 0) {
-				console.error('Sam, route', route_id, 'has no stops?!');
+				// Nothing to list, just move on
 				return;
 			}
 			[...section.querySelectorAll('ol')].forEach(list => list.remove());
