@@ -29,54 +29,6 @@ class GTFS extends Worker {
 		this.stops = {};
 	}
 
-	enlargeExtremes(latlng) {
-		if (latlng instanceof google.maps.LatLng) {
-			this.extremes = {
-				north: Math.max(this.extremes.north, latlng.lat()),
-				south: Math.min(this.extremes.south, latlng.lat()),
-				east: Math.max(this.extremes.east, latlng.lng()),
-				west: Math.min(this.extremes.west, latlng.lng()),
-			};
-		}
-		if (latlng instanceof google.maps.LatLngBounds) {
-			this.extremes = {
-				north: Math.max(this.extremes.north, latlng.Ua.i),
-				south: Math.min(this.extremes.south, latlng.Ua.g),
-				east: Math.max(this.extremes.east, latlng.La.i),
-				west: Math.min(this.extremes.west, latlng.La.g),
-			};
-		}
-		if (Number.isFinite(latlng.lat)) {
-			this.extremes = {
-				north: Math.max(this.extremes.north, latlng.lat),
-				south: Math.min(this.extremes.south, latlng.lat),
-			};
-		}
-		if (Number.isFinite(latlng.lng)) {
-			this.extremes = {
-				east: Math.max(this.extremes.east, latlng.lng),
-				west: Math.min(this.extremes.west, latlng.lng),
-			};
-		}
-		if (Number.isFinite(latlng.north)) {
-			this.extremes.north = Math.max(this.extremes.north, latlng.north);
-		}
-		if (Number.isFinite(latlng.south)) {
-			this.extremes.south = Math.min(this.extremes.south, latlng.south);
-		}
-		if (Number.isFinite(latlng.east)) {
-			this.extremes.east = Math.max(this.extremes.east, latlng.east);
-		}
-		if (Number.isFinite(latlng.west)) {
-			this.extremes.west = Math.min(this.extremes.west, latlng.west);
-		}
-		this.map.setOptions({
-			restriction: {
-				latLngBounds: this.extremes,
-			},
-		});
-	}
-
 	listAgencies(agencies) {
 		if (!Array.isArray(agencies)) {
 			return;
@@ -251,7 +203,6 @@ class GTFS extends Worker {
 			return;
 		}
 		this.shapes[shape.shape_id] = shape;
-		console.log('Sam, bounds, drawing polyline,', shape.shape_id);
 		if (!(this.polylines[shape.shape_id] instanceof google.maps.Polyline)) {
 			this.polylines[shape.shape_id] = new google.maps.Polyline({
 				geodesic: true,
@@ -296,19 +247,6 @@ class GTFS extends Worker {
 			path: shape.path,
 		});
 		this.zoomChangePolylines(shape);
-
-		let bounds = {
-			...this.extremes,
-		};
-		shape.path.forEach((pt) => {
-			bounds = {
-				north: Math.max(bounds.north, pt.lat),
-				south: Math.min(bounds.south, pt.lat),
-				east: Math.max(bounds.east, pt.lng),
-				west: Math.min(bounds.west, pt.lng),
-			};
-		});
-		this.enlargeExtremes(bounds);
 	}
 
 	// Add Stops to Routes and Map
@@ -332,9 +270,11 @@ class GTFS extends Worker {
 			stops.forEach((stop) => {
 				const li = document.createElement('li');
 				let title = stop.stop_name;
-				if (typeof stop.stop_code === 'string' && Number.isFinite(Number.parseInt(stop.stop_code))) {
-					title = `${stop.stop_code} ${stop.stop_name}`;
-					li.setAttribute('value', stop.stop_code);
+				if (typeof stop.stop_code === 'string') {
+					title = `${stop.stop_code}. ${stop.stop_name}`;
+					if (Number.isFinite(Number.parseInt(stop.stop_code))) {
+						li.setAttribute('value', stop.stop_code);
+					}
 				}
 				li.innerHTML = stop.stop_name;
 				list.appendChild(li);
@@ -475,28 +415,6 @@ yodasws.page('home').setRoute({
 			minZoom: 9,
 			zoom: 11,
 			center: results[0].geometry.location,
-			restriction: {
-				latLngBounds: (() => {
-					if (loc.bounds) {
-						return loc.bounds;
-					}
-					const bounds = results[0].geometry.bounds;
-					if (bounds.Ua && bounds.La) {
-						return {
-							north: bounds.Ua.i,
-							east: bounds.La.i,
-							south: bounds.Ua.g,
-							west: bounds.La.g,
-						};
-					}
-					return {
-						north: bounds.northeast.lat,
-						east: bounds.northeast.lng,
-						south: bounds.southwest.lat,
-						west: bounds.southwest.lng,
-					};
-				})(),
-			},
 		});
 		gtfs.map.zoom = gtfs.map.getZoom();
 		gtfs.map.addListener('zoom_changed', (e) => {
@@ -504,11 +422,6 @@ yodasws.page('home').setRoute({
 			if (gtfs.polylines && typeof gtfs.polylines === 'object') {
 				gtfs.zoomChangePolylines();
 			}
-		});
-		const loadHandler = gtfs.map.addListener('tilesloaded', () => {
-			// console.log('Sam, bounds, getting bounds');
-			gtfs.enlargeExtremes(gtfs.map.getBounds());
-			google.maps.event.removeListener(loadHandler);
 		});
 	});
 
