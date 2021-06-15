@@ -364,6 +364,8 @@ yodasws.page('home').setRoute({
 				files: [
 					'us/nyc-subway',
 					'us/nyc-m-bus',
+					'us/nyc-q-bus',
+					'us/nyc-path',
 				],
 			},
 		};

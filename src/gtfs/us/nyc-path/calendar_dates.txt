@@ -1,0 +1,19 @@
+service_id,date,holiday_name,exception_type
+c_21359_b_29759_d_31,20220221,President's Day ,2
+c_21359_b_29759_d_31,20220117,Martin Luther King Jr. Day,2
+c_21359_b_29759_d_31,20211126,Day After Thanksgiving ,2
+c_21359_b_29759_d_31,20211125,Thanksgiving Day,2
+c_21359_b_29759_d_31,20211111,Veterans Day,2
+c_21359_b_29759_d_31,20211011,Columbus Day,2
+c_21359_b_29759_d_31,20210906,Labor Day,2
+c_21193_b_none_d_64,20210613,Service Adjustment,1
+c_20803_b_none_d_0,20220221,President's Day ,1
+c_20803_b_none_d_0,20220117,Martin Luther King Jr. Day,1
+c_20803_b_none_d_0,20211125,Thanksgiving Day,1
+c_20803_b_none_d_0,20211111,Veterans Day,1
+c_20803_b_none_d_0,20211011,Columbus Day,1
+c_20803_b_none_d_0,20210906,Labor Day,1
+c_20803_b_none_d_0,20210704,Independence Day,1
+c_19861_b_26688_d_64,20210704,Independence Day,2
+c_19861_b_26688_d_64,20210613,Service Adjustment,2
+c_18229_b_none_d_31,20211126,Day After Thanksgiving ,1

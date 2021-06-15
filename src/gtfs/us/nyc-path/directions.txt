@@ -1,0 +1,12 @@
+route_id,direction_id,direction
+859,0,To Hoboken
+859,1,To 33rd
+860,0,To Hoboken
+860,1,To WTC
+861,0,To Journal Sq
+861,1,To 33rd
+862,0,To Newark
+862,1,To WTC
+1024,0,To Journal Sq
+1024,1,To 33rd
+5744,0,No direction

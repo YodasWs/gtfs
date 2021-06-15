@@ -1,0 +1,5 @@
+service_id,service_description
+c_19860_b_26687_d_32,Saturday WTC Open (Saturday only)
+c_19861_b_26688_d_64,Sunday WTC Open (Sunday only)
+c_20176_b_26810_d_127,Port Authority of NY and NJ starting 6/13/20 (All days of week)
+c_21359_b_29759_d_31,Weekday Baseline starting 4/26 (Weekday)
