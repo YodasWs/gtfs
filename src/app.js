@@ -66,6 +66,7 @@ class GTFS extends Worker {
 			return;
 		}
 
+		// Add to DOM
 		routes.forEach((route) => {
 			let section = document.querySelector(`section[data-route-id="${route.route_id}"]`);
 			if (section instanceof Element && section.querySelector('h1') instanceof Element) {
@@ -90,6 +91,7 @@ class GTFS extends Worker {
 			}
 		});
 
+		// Attach event listener to highlight route
 		this.eventAborts.abort();
 		this.eventAborts = new AbortController();
 		[...document.querySelectorAll('section[data-route-id] > h1, section[data-route-id] > h2')].forEach((section) => {
@@ -97,16 +99,8 @@ class GTFS extends Worker {
 				signal: this.eventAborts.signal,
 			});
 		});
-		this.sortRoutes();
-	}
 
-	// TODO: Sort routes in order in DOM
-	sortRoutes() {
-		console.log('Sam, sortRoutes');
-		const main = document.querySelector('main');
-		if (!(main instanceof Element)) {
-			return;
-		}
+		// Sort routes in order in DOM
 		[...document.querySelectorAll('section[data-route-id]')].sort((a, b) => {
 			const aRouteType = a.getAttribute('data-route-type');
 			const bRouteType = b.getAttribute('data-route-type');
