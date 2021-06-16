@@ -318,7 +318,7 @@ class GTFS extends Worker {
 			if (typeof this.stops[route_id] === 'object' && this.stops[route_id] !== null) {
 				Object.entries(this.stops[route_id]).forEach(([stop_id, stop]) => {
 					stop.highlighted = false;
-					stop.setMap(null);
+					stop.setVisible(false);
 				});
 			}
 			s.classList.remove('highlighted');
@@ -346,7 +346,7 @@ class GTFS extends Worker {
 			Object.entries(this.stops[route_id]).forEach(([stop_id, stop]) => {
 				stop.setOptions(this.getStopOptionsForRouteType(stop.route_type));
 				stop.highlighted = true;
-				stop.setMap(this.map);
+				stop.setVisible(true);
 			});
 		}
 		this.zoomChangePolylines();
@@ -363,61 +363,82 @@ class GTFS extends Worker {
 
 	zoomChangePolylines(shape = null) {
 		// TODO: Use shape.route_type to further adjust weight and opacity
-		const adjust = {
-			opacity: {
-				rail: 1,
-				bus: 1,
-				etc: 1,
-			},
-			weight: {
-				rail: 0,
-				bus: 0,
-				etc: 0,
-			},
-		};
-		const routeTypeMap = new Map([
-			[1, 'rail'],
-			[7, 'bus'],
-		]);
-		let opacityAdjust = 1;
-		if (this.map.zoom >= 10) {
-			adjust.weight.rail = 1;
-		}
-		if (this.map.zoom >= 12) {
-			adjust.weight.rail = 2;
-		}
-		if (this.map.zoom >= 14) {
-			opacityAdjust = 1.5;
-			adjust.weight.bus = this.map.zoom - 13;
-			adjust.weight.rail = this.map.zoom - 12;
-		}
-		if (this.map.zoom >= 16) {
-			adjust.weight.bus = this.map.zoom - 14;
-		}
-		Object.entries(
-			typeof shape === 'object' && shape !== null ? {
-				[shape.shape_id]: shape,
-			} : this.shapes
-		).forEach(([shape_id, shape]) => {
-			if (shape.highlighted) return;
-			if (this.polylines[shape.shape_id] instanceof google.maps.Polyline) {
-				let route_type = 'etc';
-				if (Number.parseInt(shape.route_type) >= 100) {
-					const num = Math.floor(Number.parseInt(shape.route_type) / 100);
-					if (routeTypeMap.has(num)) route_type = routeTypeMap.get(num);
-				} else if (shape.route_type === '0') {
-					route_type = 'rail';
-				} else if (shape.route_type === '2') {
-					route_type = 'rail';
-				} else if (shape.route_type === '3') {
-					route_type = 'bus';
-				}
-				this.polylines[shape.shape_id].setOptions({
-					strokeOpacity: shape.opacity * opacityAdjust,
-					strokeWeight: shape.weight + adjust.weight[route_type],
-				});
+		// TODO: Use agency_id to further refine weight and opacity
+		// (Because thick lines are good for Hakone and Charlotte, but not densely-packed New York City)
+		(() => {
+			if (typeof this.polylines !== 'object' || this.polylines === null) return;
+			const adjust = {
+				opacity: {
+					rail: 1,
+					bus: 1,
+					etc: 1,
+				},
+				weight: {
+					rail: 0,
+					bus: 0,
+					etc: 0,
+				},
+			};
+			const routeTypeMap = new Map([
+				[1, 'rail'],
+				[7, 'bus'],
+			]);
+
+			// Make Lines Thicker for Easier Reading
+			let opacityAdjust = 1;
+			if (this.map.zoom >= 10) {
+				adjust.weight.rail = 1;
 			}
-		});
+			if (this.map.zoom >= 12) {
+				adjust.weight.rail = 2;
+			}
+			if (this.map.zoom >= 14) {
+				opacityAdjust = 1.5;
+				adjust.weight.bus = this.map.zoom - 13;
+				adjust.weight.rail = this.map.zoom - 12;
+			}
+			if (this.map.zoom >= 16) {
+				adjust.weight.bus = this.map.zoom - 14;
+			}
+			Object.entries(
+				typeof shape === 'object' && shape !== null ? {
+					[shape.shape_id]: shape,
+				} : this.shapes
+			).forEach(([shape_id, shape]) => {
+				if (shape.highlighted) return;
+				if (this.polylines[shape.shape_id] instanceof google.maps.Polyline) {
+					let route_type = 'etc';
+					if (Number.parseInt(shape.route_type) >= 100) {
+						const num = Math.floor(Number.parseInt(shape.route_type) / 100);
+						if (routeTypeMap.has(num)) route_type = routeTypeMap.get(num);
+					} else if (shape.route_type === '0') {
+						route_type = 'rail';
+					} else if (shape.route_type === '2') {
+						route_type = 'rail';
+					} else if (shape.route_type === '3') {
+						route_type = 'bus';
+					}
+					this.polylines[shape.shape_id].setOptions({
+						strokeOpacity: shape.opacity * opacityAdjust,
+						strokeWeight: shape.weight + adjust.weight[route_type],
+					});
+				}
+			});
+		})();
+
+		(() => {
+			if (typeof this.stops !== 'object' || this.stops === null) return;
+			// Update visibility of Stops
+			Object.entries(this.stops).forEach(([route_id, stops]) => {
+				Object.entries(stops).forEach(([stop_id, stop]) => {
+					if (this.map.zoom >= this.getMinZoomForRouteType(stop.route_type)) {
+						stop.setVisible(true);
+					} else if (!stop.highlighted) {
+						stop.setVisible(false);
+					}
+				});
+			});
+		})();
 	}
 
 	drawPolylines(shapes) {
@@ -518,6 +539,8 @@ class GTFS extends Worker {
 							lat: Number.parseFloat(stop.stop_lat),
 							lng: Number.parseFloat(stop.stop_lon),
 						},
+						visible: false,
+						map: this.map,
 						title,
 					});
 					// TODO: Add info windows
@@ -650,20 +673,8 @@ yodasws.page('home').setRoute({
 		});
 		gtfs.map.zoom = gtfs.map.getZoom();
 		gtfs.map.addListener('zoom_changed', (e) => {
-			// Make Lines Thicker for Easier Reading
-			if (gtfs.polylines && typeof gtfs.polylines === 'object') {
-				gtfs.zoomChangePolylines();
-			}
-			Object.entries(gtfs.stops).forEach(([route_id, stops]) => {
-				Object.entries(stops).forEach(([stop_id, stop]) => {
-					if (gtfs.map.zoom >= gtfs.getMinZoomForRouteType(stop.route_type)) {
-						stop.setMap(gtfs.map);
-					} else if (!stop.highlighted) {
-						stop.setMap(null);
-					}
-				});
-			});
-			// TODO: Show stops when User zooms in
+			gtfs.zoomChangePolylines();
+			console.log('Sam, zoom:', gtfs.map.zoom);
 		});
 	});
 	gtfs.buildPins();
