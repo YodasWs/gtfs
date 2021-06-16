@@ -13,6 +13,25 @@ function showNoWorkerError() {
 	});
 }
 
+const route_types = {
+	tram: { // Tram, Streetcar, Light Rail
+		minZoom: 10,
+		zIndex: 90,
+	},
+	metro: { // Subway, Metro
+		minZoom: 14,
+		zIndex: 95,
+	},
+	rail: { // Rail
+		minZoom: 12,
+		zIndex: 100,
+	},
+	bus: { // Bus
+		minZoom: 15,
+		zIndex: 0,
+	},
+};
+
 // TODO: Place DOM and Maps manipulation here
 // TODO: Place Data manipulation in Worker
 class GTFS extends Worker {
@@ -28,6 +47,149 @@ class GTFS extends Worker {
 		this.polylines = {};
 		this.shapes = {};
 		this.stops = {};
+	}
+
+	buildPins() {
+		const PIN_BASE = 'pins/';
+		route_types.tram.icon = {
+			url: `${PIN_BASE}icons8-tram-32.png`,
+			scaledSize: { width: 22, height: 22, }, // new google.maps.Size(22, 22),
+			anchor: { x: 11, y: 11 },
+		};
+		route_types.metro.icon = {
+			url: `${PIN_BASE}icons8-tram-32.png`,
+			scaledSize: { width: 22, height: 22, }, // new google.maps.Size(22, 22),
+			anchor: { x: 11, y: 11 },
+		};
+		route_types.rail.icon = {
+			url: `${PIN_BASE}icons8-tram-32.png`,
+			scaledSize: { width: 22, height: 22, }, // new google.maps.Size(22, 22),
+			anchor: { x: 11, y: 11 },
+		};
+		route_types.bus.icon = {
+			url: `${PIN_BASE}icons8-bus-32.png`,
+			scaledSize: { width: 22, height: 22, }, // new google.maps.Size(22, 22),
+			anchor: { x: 11, y: 11 },
+		};
+	}
+
+	getStopOptionsForRouteType(route_type) {
+		const intRouteType = Number.parseInt(route_type);
+		const icon = (() => {
+			if (typeof route_types[route_type] === 'object'
+				&& route_types[route_type] !== null
+				&& Number.isFinite(route_types[route_type].icon)) {
+				return route_types[route_type].icon;
+			}
+			if (route_type !== '3') console.log('Sam, getPinForType, route_type:', route_type);
+			if (Number.isFinite(intRouteType)) {
+				switch (Math.floor(intRouteType / 100)) {
+					case 1: // Rail
+						return route_types.rail.icon;
+					case 7: // Bus
+						return route_types.bus.icon;
+					case 9: // Tram
+						return route_types.tram.icon;
+				}
+			}
+			switch (route_type) {
+				case '0': // Tram, Streetcar, Light Rail
+					return route_types.tram.icon;
+				case '1': // Subway, Metro
+					return route_types.metro.icon;
+				case '2': // Rail
+					return route_types.rail.icon;
+				case '3': // Bus
+					return route_types.bus.icon;
+				case '4': // Ferry
+					return route_types.tram.icon;
+				case '5': // Cable Car
+					return route_types.tram.icon;
+				case '6': // Aerial Lift
+					return route_types.tram.icon;
+				case '7': // Funicular
+					return route_types.tram.icon;
+				case '11': // Trolleyus
+					return route_types.bus.icon;
+				case '12': // Monorail
+					return route_types.metro.icon;
+			}
+			return route_types.bus.icon;
+		})();
+		const zIndex = (() => {
+			if (Number.isFinite(intRouteType)) {
+				switch (Math.floor(intRouteType / 100)) {
+					case 1: // Rail
+						return 100;
+					case 7: // Bus
+						return 0;
+					case 9: // Tram
+						return 90;
+				}
+			}
+			switch (route_type) {
+				case '0': // Tram, Streetcar, Light Rail
+					return route_types.tram.zIndex;
+				case '1': // Subway, Metro
+					return route_types.metro.zIndex;
+				case '2': // Rail
+					return route_types.rail.zIndex;
+				case '3': // Bus
+					return route_types.bus.zIndex;
+				case '4': // Ferry
+					return route_types.tram.zIndex;
+				case '5': // Cable Car
+					return route_types.tram.zIndex;
+				case '6': // Aerial Lift
+					return route_types.tram.zIndex;
+				case '7': // Funicular
+					return route_types.tram.zIndex;
+				case '11': // Trolleyus
+					return route_types.bus.zIndex;
+				case '12': // Monorail
+					return route_types.metro.zIndex;
+			}
+			return 0;
+		})();
+		console.log('Sam, route_type', route_type, 'zIndex', zIndex);
+		return {
+			minZoom: this.getMinZoomForRouteType(route_type),
+			zIndex: Number.parseInt(route_type),
+			icon,
+		};
+	}
+
+	getPinForType(route_type) {
+	}
+
+	getMinZoomForRouteType(route_type) {
+		if (typeof route_types[route_type] === 'object'
+			&& route_types[route_type] !== null
+			&& Number.isFinite(route_types[route_type].minZoom)) {
+			return route_types[route_type].minZoom;
+		}
+		const intRouteType = Number.parseInt(route_type);
+		if (Number.isFinite(intRouteType)) {
+			switch (intRouteType) {
+				case 107: // Tourist Rail
+					return route_types.rail.minZoom + 1;
+				case 107: // Shuttle Rail
+					return route_types.bus.minZoom;
+			}
+			switch (Math.floor(intRouteType / 100)) {
+				case 1: // Rail
+					return route_types.rail.minZoom;
+				case 4: // Urban Rail
+					return route_types.metro.minZoom;
+				case 7: // Bus
+					return route_types.bus.minZoom;
+				case 8: // Trolleybus
+					return route_types.bus.minZoom;
+				case 9: // Tram
+					return route_types.tram.minZoom;
+			}
+		}
+		return 16;
 	}
 
 	listAgencies(agencies) {
@@ -182,6 +344,7 @@ class GTFS extends Worker {
 		// Update Map
 		if (!unhighlight && typeof this.stops[route_id] === 'object' && this.stops[route_id] !== null) {
 			Object.entries(this.stops[route_id]).forEach(([stop_id, stop]) => {
+				stop.setOptions(this.getStopOptionsForRouteType(stop.route_type));
 				stop.highlighted = true;
 				stop.setMap(this.map);
 			});
@@ -332,36 +495,34 @@ class GTFS extends Worker {
 				this.stops[route_id] = {};
 			}
 			const list = document.createElement('ol');
+			const route_type = section.getAttribute('data-route-type');
 			stops.forEach((stop) => {
 				const li = document.createElement('li');
 				let title = stop.stop_name;
-				if (typeof stop.stop_code === 'string') {
+				if (typeof stop.stop_code === 'string' && stop.stop_code !== '') {
 					title = `${stop.stop_code}. ${stop.stop_name}`;
 					if (Number.isFinite(Number.parseInt(stop.stop_code))) {
-						li.setAttribute('value', stop.stop_code);
+						// li.setAttribute('value', stop.stop_code);
+						// li.innerHTML = stop.stop_name;
+					} else {
 					}
+						li.innerHTML = `${stop.stop_name} (${stop.stop_code})`;
+				} else {
+					li.innerHTML = stop.stop_name;
 				}
-				li.innerHTML = stop.stop_name;
 				list.appendChild(li);
 				if (!(this.stops[route_id][stop.stop_id] instanceof google.maps.Marker)) {
 					this.stops[route_id][stop.stop_id] = new google.maps.Marker({
+						...this.getStopOptionsForRouteType(route_type),
 						position: {
 							lat: Number.parseFloat(stop.stop_lat),
 							lng: Number.parseFloat(stop.stop_lon),
 						},
 						title,
-						icon: {
-							url: 'https://yodasws.github.io/gtfs/pins/icons8-tram-32.png',
-							scaledSize: new google.maps.Size(22, 22),
-							anchor: { x: 11, y: 11 }
-						},
-						/*
-					label: {
-						text: stop.stop_sequence,
-					},
-						/**/
 					});
+					// TODO: Add info windows
 				}
+				this.stops[route_id][stop.stop_id].route_type = route_type;
 			});
 			section.appendChild(list);
 		});
@@ -491,9 +652,9 @@ yodasws.page('home').setRoute({
 			}
 			Object.entries(gtfs.stops).forEach(([route_id, stops]) => {
 				Object.entries(stops).forEach(([stop_id, stop]) => {
-					if (stop.highlighted) {
+					if (gtfs.map.zoom >= gtfs.getMinZoomForRouteType(stop.route_type)) {
 						stop.setMap(gtfs.map);
-					} else {
+					} else if (!stop.highlighted) {
 						stop.setMap(null);
 					}
 				});
@@ -501,6 +662,7 @@ yodasws.page('home').setRoute({
 			// TODO: Show stops when User zooms in
 		});
 	});
+	gtfs.buildPins();
 
 	return;
 
