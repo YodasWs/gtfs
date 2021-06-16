@@ -155,6 +155,7 @@ class GTFS extends Worker {
 			const route_id = s.getAttribute('data-route-id');
 			if (typeof this.stops[route_id] === 'object' && this.stops[route_id] !== null) {
 				Object.entries(this.stops[route_id]).forEach(([stop_id, stop]) => {
+					stop.highlighted = false;
 					stop.setMap(null);
 				});
 			}
@@ -181,6 +182,7 @@ class GTFS extends Worker {
 		// Update Map
 		if (!unhighlight && typeof this.stops[route_id] === 'object' && this.stops[route_id] !== null) {
 			Object.entries(this.stops[route_id]).forEach(([stop_id, stop]) => {
+				stop.highlighted = true;
 				stop.setMap(this.map);
 			});
 		}
@@ -487,6 +489,16 @@ yodasws.page('home').setRoute({
 			if (gtfs.polylines && typeof gtfs.polylines === 'object') {
 				gtfs.zoomChangePolylines();
 			}
+			Object.entries(gtfs.stops).forEach(([route_id, stops]) => {
+				Object.entries(stops).forEach(([stop_id, stop]) => {
+					if (stop.highlighted) {
+						stop.setMap(gtfs.map);
+					} else {
+						stop.setMap(null);
+					}
+				});
+			});
+			// TODO: Show stops when User zooms in
 		});
 	});
 
