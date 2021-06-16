@@ -574,9 +574,13 @@ yodasws.page('home').setRoute({
 				search: 'New York City',
 				title: 'New York City',
 				files: [
+					'us/nyc-bx-bus',
+					'us/nyc-si-bus',
 					'us/nyc-subway',
+					'us/nyc-b-bus',
 					'us/nyc-m-bus',
 					'us/nyc-q-bus',
+					'us/nyc-lirr',
 					'us/nyc-path',
 				],
 			},
