@@ -75,6 +75,8 @@ class GTFS extends Worker {
 
 			section = document.createElement('section');
 			section.setAttribute('data-route-id', route.route_id);
+			section.setAttribute('data-route-type', route.route_type);
+			section.setAttribute('data-route-short-name', route.route_short_name);
 			main.appendChild(section);
 
 			if (route.route_short_name) {
@@ -95,6 +97,59 @@ class GTFS extends Worker {
 				signal: this.eventAborts.signal,
 			});
 		});
+		this.sortRoutes();
+	}
+
+	// TODO: Sort routes in order in DOM
+	sortRoutes() {
+		console.log('Sam, sortRoutes');
+		const main = document.querySelector('main');
+		if (!(main instanceof Element)) {
+			return;
+		}
+		[...document.querySelectorAll('section[data-route-id]')].sort((a, b) => {
+			const aRouteType = a.getAttribute('data-route-type');
+			const bRouteType = b.getAttribute('data-route-type');
+			// TODO: Do this sort in the DOM so to apply to all agencies/files
+			if (aRouteType !== bRouteType) {
+				const a_num = Number.parseInt(aRouteType);
+				const b_num = Number.parseInt(bRouteType);
+				if (Number.isFinite(a_num) && Number.isFinite(b_num) && a_num !== b_num) {
+					const aIsBus = a_num === 3 || Math.floor(a_num / 100) === 7;
+					const bIsBus = b_num === 3 || Math.floor(b_num / 100) === 7;
+					// Both buses, sort by code
+					if (aIsBus && bIsBus) {
+						return a_num - b_num;
+					}
+					// Bus is lowest priority
+					if (aIsBus !== bIsBus) {
+						if (aIsBus) return 1;
+						if (bIsBus) return -1;
+					}
+					if (Math.floor(a_num / 100) !== Math.floor(b_num / 100)) {
+						if (Math.floor(a_num / 100) == 8) return 1; // Trolleybus Service
+						if (Math.floor(b_num / 100) == 8) return -1; // Trolleybus Service
+						if (Math.floor(a_num / 100) == 2) return 1; // Coach Service
+						if (Math.floor(b_num / 100) == 2) return -1; // Coach Service
+					}
+					return a_num - b_num;
+				}
+			}
+			const aRouteName = a.getAttribute('data-route-short-name');
+			const bRouteName = b.getAttribute('data-route-short-name');
+			if (aRouteName && bRouteName) {
+				const a_num = Number.parseInt(aRouteName);
+				const b_num = Number.parseInt(bRouteName);
+				if (Number.isFinite(a_num) && Number.isFinite(b_num) && a_num !== b_num) {
+					return a_num - b_num;
+				}
+				return aRouteName.localeCompare(bRouteName);
+			}
+			return 0;
+		}).forEach((section) => {
+			main.appendChild(section);
+		});
+		return;
 	}
 
 	activateRoute(event) {
