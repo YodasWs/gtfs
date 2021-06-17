@@ -119,6 +119,10 @@ tozan_H_1,,,145,45,,0
 tozan_H_1,,,oshiba,49,,0
 tozan_H_1,,,151,51,,0
 tozan_H_1,,,motohakone-ko,52,,0
+tozan_H_1,,,153,53,,0
+tozan_H_1,,,154,54,,0
+tozan_H_1,,,155,55,,0
+tozan_H_1,,,156,56,,0
 tozan_H_1,,,hakonemachi,57,,0
 tozan_R_0,,,stn-odawara-east,1,,0
 tozan_R_0,,,122,2,,0
@@ -235,3 +239,15 @@ bus_V_1,,,togendai,20,,0
 cruise_1,,,motohakone-ko,1,,0
 cruise_1,,,hakonemachi,2,,0
 cruise_1,,,togendai,3,,0
+bus_N_1,,,motohakone-ko,1,,0
+bus_N_1,,,153,2,,0
+bus_N_1,,,154,3,,0
+bus_N_1,,,155,4,,0
+bus_N_1,,,156,5,,0
+bus_N_1,,,hakonemachi,6,,0
+bus_N_1,,,759,8,,0
+bus_N_1,,,760,9,,0
+bus_N_1,,,761,10,,0
+bus_N_1,,,762,11,,0
+bus_N_1,,,769,12,,0
+bus_N_1,,,798,13,,0

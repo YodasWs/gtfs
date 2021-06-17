@@ -4,3 +4,4 @@ odakyu_tozan_ropeway,Hakone Tozan Ropeway,http://www.hakoneropeway.co.jp/foreign
 odakyu_tozan_bus,Hakone Tozan Bus,https://www.hakone-tozanbus.co.jp/english/index.html,Asia/Tokyo,en,
 odakyu_highway_bus,Hakone Highway Bus,http://www.odakyu-hakonehighway.co.jp/,Asia/Tokyo,en,
 odakyu_hakone_cruise,Hakone Sightseeing Cruise,http://www.hakonenavi.jp/english/traffic/transportation/sightseeing-cruise/,Asia/Tokyo,en,
+tokai_bus,Tokai Bus,https://www.tokaibus.jp/,Asia/Tokyo,jp,
