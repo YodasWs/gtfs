@@ -282,10 +282,19 @@ class GTFS extends Worker {
 				});
 			}
 			s.classList.remove('highlighted');
+			const ol = s.querySelector('ol');
+			if (ol instanceof Element) {
+				ol.style.maxHeight = '0';
+			}
 		});
 		if (!unhighlight) {
 			// Hightlight the selected section
 			section.classList.add('highlighted');
+			// Make list of stops visible
+			const ol = section.querySelector('ol');
+			if (ol instanceof Element) {
+				ol.style.maxHeight = `${ol.getAttribute('data-max-height')}px`;
+			}
 		}
 		const route_id = section.getAttribute('data-route-id');
 		console.log('Sam, activateRoute:', route_id);
@@ -311,6 +320,17 @@ class GTFS extends Worker {
 		}
 		this.zoomChangePolylines();
 		if (!unhighlight) {
+			section.scrollIntoView({
+				behavior: 'smooth',
+				block: 'center',
+			});
+			setTimeout(() => {
+				section.scrollIntoView({
+					behavior: 'smooth',
+					block: 'start',
+				});
+			}, 1000);
+			/*
 			const elMap = document.querySelector('#google-maps');
 			if (elMap instanceof Element) {
 				elMap.scrollIntoView({
@@ -318,6 +338,7 @@ class GTFS extends Worker {
 					block: 'center',
 				});
 			}
+			/**/
 		}
 	}
 
@@ -508,6 +529,8 @@ class GTFS extends Worker {
 				this.stops[route_id][stop.stop_id].route_type = route_type;
 			});
 			section.appendChild(list);
+			// Set max-height on list
+			list.setAttribute('data-max-height', list.offsetHeight);
 		});
 	}
 };

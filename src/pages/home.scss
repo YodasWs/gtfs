@@ -116,6 +116,16 @@ $col4: "(min-width: 1000px)";
 			flex-grow: 1;
 			order: 1;
 		}
+
+		> ol[data-max-height] {
+			max-height: 0;
+			overflow: hidden;
+			transition: max-height 1s;
+		}
+
+		&.highlighted > ol[data-max-height] {
+			max-height: attr(data-max-height px);
+		}
 	}
 
 	> .error {

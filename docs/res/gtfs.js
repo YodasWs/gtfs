@@ -193,6 +193,7 @@ globalThis.gtfs = {
 	},
 
 	// Load and Draw GTFS Shapes
+	// TODO: Some loading spinners and progress bars would be useful/helpful
 	loadGTFS(url) {
 		// Load and list agencies
 		ajax({
@@ -210,41 +211,7 @@ globalThis.gtfs = {
 		}).then((routes) => {
 			setTimeout(() => {
 			// Sort routes by type then number/name
-			routes.sort((a, b) => {
-				if (a.route_type !== b.route_type) {
-					const a_num = Number.parseInt(a.route_type);
-					const b_num = Number.parseInt(b.route_type);
-					if (Number.isFinite(a_num) && Number.isFinite(b_num) && a_num !== b_num) {
-						const aIsBus = a_num === 3 || Math.floor(a_num / 100) === 7;
-						const bIsBus = b_num === 3 || Math.floor(b_num / 100) === 7;
-						// Both buses, sort by code
-						if (aIsBus && bIsBus) {
-							return a_num - b_num;
-						}
-						// Bus is lowest priority
-						if (aIsBus !== bIsBus) {
-							if (aIsBus) return 1;
-							if (bIsBus) return -1;
-						}
-						if (Math.floor(a_num / 100) !== Math.floor(b_num / 100)) {
-							if (Math.floor(a_num / 100) == 8) return 1; // Trolleybus Service
-							if (Math.floor(b_num / 100) == 8) return -1; // Trolleybus Service
-							if (Math.floor(a_num / 100) == 2) return 1; // Coach Service
-							if (Math.floor(b_num / 100) == 2) return -1; // Coach Service
-						}
-						return a_num - b_num;
-					}
-				}
-				if (a.route_short_name && b.route_short_name) {
-					const a_num = Number.parseInt(a.route_short_name);
-					const b_num = Number.parseInt(b.route_short_name);
-					if (Number.isFinite(a_num) && Number.isFinite(b_num) && a_num !== b_num) {
-						return a_num - b_num;
-					}
-					return a.route_short_name.localeCompare(b.route_short_name);
-				}
-				return 0;
-			}).forEach((route) => {
+			routes.forEach((route) => {
 				// Set Route Icon (emoji)
 				if (typeof route.x_route_icon !== 'string' || route.x_route_icon === '') {
 					switch (route.route_type) {
