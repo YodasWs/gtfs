@@ -11,9 +11,11 @@ hakone_ropeway_lower,ropeway_2021,ropeway_3,Togendai,,0,ropeway_2,,2
 hakone_ropeway_lower,ropeway_2021,ropeway_4,Owakudani,,1,ropeway_2,,2
 cruise,tozan_q1,cruise_1,Togendai,,0,cruise,cruise_poly,
 tozan_S,tozan_q1,tozan_S_1,Ten-yu,,0,tozan_S,,
+tozan_G,tozan_q1,tozan_G_1,Ten-yu,,0,tozan_G,,
 tozan_M,tozan_q1,tozan_M_1,Ten-yu,,0,tozan_M,,
 tozan_H,tozan_q1,tozan_H_1,Hakonemachi,,0,tozan_H,,
 tozan_K,tozan_q1,tozan_K_1,Motohakone,,0,tozan_K,,
+tozan_L,tozan_q1,tozan_L_1,Gotemba Outlets,,0,tozan_L,,
 tozan_R,tozan_q1,tozan_R_0,Motohakone,,0,tozan_R,,
 tozan_R,tozan_q1,tozan_R_1,Odawara,,1,tozan_R,,
 tozan_T,tozan_q1,tozan_T_1,Togendai,,0,tozan_T,,

@@ -5,7 +5,9 @@ tozan_cable,odakyu_tozan_rail,,Hakone Tozan Cable Car,1400,,,DEB887,
 hakone_ropeway_lower,odakyu_tozan_ropeway,Hakone Ropeway,Gora–Owakudani,1300,,,000000,ffffff
 hakone_ropeway_upper,odakyu_tozan_ropeway,Hakone Ropeway,Owakudani–Togendai,1300,,,000000,ffffff
 cruise,odakyu_hakone_cruise,,Hakone Sightseeing Cruise,1200,,http://www.hakonenavi.jp/english/traffic/transportation/sightseeing-cruise/,fdd000,
+tozan_G,odakyu_tozan_bus,G,Gotemba Line,704,,,0097dd,
 tozan_H,odakyu_tozan_bus,H,Hakone-machi Line,704,,,d8273c,
+tozan_L,odakyu_tozan_bus,L,Outlets Tokinosumika Line,704,,,e4007f,
 tozan_M,odakyu_tozan_bus,M,Kanko Shisetsu-megui (via Miyagino),704,,,f08300,
 tozan_S,odakyu_tozan_bus,S,Kanko Shisetsu-megui (via Pola-bijutsukan),704,,,65007b,ffffff
 tozan_T,odakyu_tozan_bus,T,Togendai Line,704,,,165CC3,
