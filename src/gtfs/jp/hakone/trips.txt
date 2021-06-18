@@ -9,7 +9,7 @@ hakone_ropeway_upper,ropeway_2021,ropeway_1,Owakudani,,0,ropeway_1,,2
 hakone_ropeway_upper,ropeway_2021,ropeway_2,Sounzan,,1,ropeway_1,,2
 hakone_ropeway_lower,ropeway_2021,ropeway_3,Togendai,,0,ropeway_2,,2
 hakone_ropeway_lower,ropeway_2021,ropeway_4,Owakudani,,1,ropeway_2,,2
-cruise,tozan_q1,cruise_1,Togendai,,0,cruise,cruise_poly,
+cruise,tozan_q1,cruise_1,Motohakone,,1,cruise,cruise_poly,
 tozan_S,tozan_q1,tozan_S_1,Ten-yu,,0,tozan_S,,
 tozan_G,tozan_q1,tozan_G_1,Ten-yu,,0,tozan_G,,
 tozan_M,tozan_q1,tozan_M_1,Ten-yu,,0,tozan_M,,

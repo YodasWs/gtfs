@@ -390,9 +390,9 @@ bus_V_1,,,250,9,,0,0,0
 bus_V_1,,,sengoku-kogen,18,,0,0,0
 bus_V_1,,,259,19,,0,0,0
 bus_V_1,,,togendai,20,,0,0,0
-cruise_1,,,motohakone-ko,1,,0,0,0
+cruise_1,,,togendai,1,,0,0,0
 cruise_1,,,hakonemachi,2,,0,0,0
-cruise_1,,,togendai,3,,0,0,0
+cruise_1,,,motohakone-ko,3,,0,0,0
 bus_N_1,,,152,1,,0,0,0
 bus_N_1,,,153,2,,0,0,0
 bus_N_1,,,154,3,,0,0,0
