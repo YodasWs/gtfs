@@ -602,10 +602,11 @@ yodasws.page('home').setRoute({
 		return;
 	}
 
+	const ROOT = window.location.hostname === 'yodasws.github.io' ? 'gtfs/' : '';
 	loc.files.forEach((feed) => {
 		gtfs.postMessage([
 			'loadGTFS',
-			feed,
+			`${ROOT}${feed}`,
 		]);
 	});
 
