@@ -193,14 +193,12 @@ globalThis.gtfs = {
 	},
 
 	// Load and Draw GTFS Shapes
-	// TODO: Some loading spinners and progress bars would be useful/helpful
 	loadGTFS(url) {
 		// Load and list agencies
 		ajax({
 			url: `/gtfs/${url}/agency.txt`,
 		}).then((agencies) => {
 			setTimeout(() => {
-			// console.log('Sam, agencies:', agencies);
 			postMessage(['listAgencies', agencies]);
 			this.loadedFiles = 'agency.txt';
 			}, Math.random() * 1000);
@@ -269,7 +267,6 @@ globalThis.gtfs = {
 				}
 				this.updateRoute(route.route_id, route);
 			});
-			// console.log('Sam, this.routes:', this.routes);
 			postMessage(['listRoutes', routes]);
 			this.loadedFiles = 'routes.txt';
 			}, Math.random() * 1000);
@@ -283,7 +280,6 @@ globalThis.gtfs = {
 				this.linkRouteShapeTrip(trip.route_id, trip.shape_id, trip.trip_id);
 				this.updateTrip(trip.trip_id, trip);
 			});
-			// console.log('Sam, this.trips:', this.trips);
 			this.loadedFiles = 'trips.txt';
 			}, Math.random() * 1000);
 		});
@@ -309,7 +305,6 @@ globalThis.gtfs = {
 				});
 			});
 			this.loadedFiles = 'shapes.txt';
-			// console.log('Sam, this.shapes:', this.shapes);
 			}, Math.random() * 1000);
 		});
 
@@ -321,7 +316,6 @@ globalThis.gtfs = {
 			stops.forEach((stop) => {
 				this.stops[stop.stop_id] = stop;
 			});
-			// console.log('Sam, this.stops:', this.stops);
 			this.loadedFiles = 'stops.txt';
 			}, Math.random() * 1000);
 		});
@@ -331,7 +325,6 @@ globalThis.gtfs = {
 			url: `/gtfs/${url}/stop_times.txt`,
 		}).then((stop_times) => {
 			setTimeout(() => {
-			// console.log('Sam, stop_times:', stop_times);
 			const trips = {};
 			stop_times.forEach((st) => {
 				if (trips[st.trip_id] === null || typeof trips[st.trip_id] !== 'object') {

@@ -297,7 +297,6 @@ class GTFS extends Worker {
 			}
 		}
 		const route_id = section.getAttribute('data-route-id');
-		console.log('Sam, activateRoute:', route_id);
 		// Highlight route on map
 		Object.entries(this.shapes).forEach(([shape_id, shape]) => {
 			shape.highlighted = false;
@@ -482,7 +481,6 @@ class GTFS extends Worker {
 	// Add Stops to Routes and Map
 	listStops(routes) {
 		Object.entries(routes).forEach(([route_id, stops]) => {
-			console.log('Sam, listStops:', route_id, stops);
 			let section = document.querySelector(`section[data-route-id="${route_id}"]`);
 			if (!(section instanceof Element)) {
 				console.error('Sam, route', route_id, 'not set?!');
@@ -658,7 +656,6 @@ yodasws.page('home').setRoute({
 		gtfs.map.zoom = gtfs.map.getZoom();
 		gtfs.map.addListener('zoom_changed', (e) => {
 			gtfs.zoomChangePolylines();
-			console.log('Sam, zoom:', gtfs.map.zoom);
 		});
 	});
 });
