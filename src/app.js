@@ -12,6 +12,7 @@ function showNoWorkerError() {
 		div.removeAttribute('hidden');
 	});
 }
+
 const zoomAdjust = {
 	opacity: {
 		rail: 1,
@@ -34,9 +35,120 @@ const zoomAdjust = {
 		etc: () => 0,
 	},
 };
+
 const route_types = {
+	'107': { // Tourist Railway
+		x_route_icon: '1f688',
+		minZoom: 12,
+		zIndex: 95,
+		icon: {
+			url: 'pins/icons8-tram-32.png',
+			scaledSize: { width: 22, height: 22, },
+			anchor: { x: 11, y: 11 },
+		},
+	},
+	'108': { // Shuttle Railway
+		x_route_icon: '1f688',
+		minZoom: 12,
+		zIndex: 95,
+		icon: {
+			url: 'pins/icons8-tram-32.png',
+			scaledSize: { width: 22, height: 22, },
+			anchor: { x: 11, y: 11 },
+		},
+	},
+	'208': { // Commuter Coach Service
+		minZoom: 15,
+		zIndex: 80,
+		x_route_icon: '1f4ba',
+		icon: {
+			url: 'pins/icons8-bus-32.png',
+			scaledSize: { width: 22, height: 22, },
+			anchor: { x: 11, y: 11 },
+		},
+	},
+	'401': { // Metro
+		x_route_icon: '1f687',
+		minZoom: 13,
+		zIndex: 95,
+		icon: {
+			url: 'pins/icons8-subway-32.png',
+			scaledSize: { width: 22, height: 22, },
+			anchor: { x: 11, y: 11 },
+		},
+	},
+	'702': { // Express Bus
+		minZoom: 15,
+		zIndex: 90,
+		x_route_icon: '1f68d',
+		icon: {
+			url: 'pins/icons8-bus-32.png',
+			scaledSize: { width: 22, height: 22, },
+			anchor: { x: 11, y: 11 },
+		},
+	},
+	'704': { // Local Bus
+		x_route_icon: '1f68c',
+		minZoom: 15,
+		zIndex: 0,
+		icon: {
+			url: 'pins/icons8-bus-32.png',
+			scaledSize: { width: 22, height: 22, },
+			anchor: { x: 11, y: 11 },
+		},
+	},
+	'901': { // "City Tram", Light Rail
+		minZoom: 13,
+		zIndex: 90,
+		x_route_icon: '1f688',
+		icon: {
+			url: 'pins/icons8-tram-32.png',
+			scaledSize: { width: 22, height: 22, },
+			anchor: { x: 11, y: 11 },
+		},
+	},
+	'902': { // Local Tram
+		minZoom: 14,
+		zIndex: 90,
+		x_route_icon: '1f68b',
+		icon: {
+			url: 'pins/icons8-tram-32.png',
+			scaledSize: { width: 22, height: 22, },
+			anchor: { x: 11, y: 11 },
+		},
+	},
+	'1200': { // Ferry
+		minZoom: 11,
+		zIndex: 100,
+		x_route_icon: '26f4',
+		icon: {
+			url: 'pins/icons8-water-transportation-32.png',
+			scaledSize: { width: 22, height: 22, },
+			anchor: { x: 11, y: 11 },
+		},
+	},
+	'1300': { // Aerial Lift
+		minZoom: 13,
+		zIndex: 90,
+		x_route_icon: '1f6a0',
+		icon: {
+			url: 'pins/icons8-funicular-32.png',
+			scaledSize: { width: 22, height: 22, },
+			anchor: { x: 11, y: 11 },
+		},
+	},
+	'1400': { // Funicular
+		minZoom: 14,
+		zIndex: 90,
+		x_route_icon: '1f69e',
+		icon: {
+			url: 'pins/icons8-funicular-32.png',
+			scaledSize: { width: 22, height: 22, },
+			anchor: { x: 11, y: 11 },
+		},
+	},
 	tram: { // Tram, Streetcar, Light Rail
-		minZoom: 10,
+		minZoom: 14,
 		zIndex: 90,
 		icon: {
 			url: 'pins/icons8-tram-32.png',
@@ -48,7 +160,7 @@ const route_types = {
 		minZoom: 14,
 		zIndex: 95,
 		icon: {
-			url: 'pins/icons8-tram-32.png',
+			url: 'pins/icons8-subway-32.png',
 			scaledSize: { width: 22, height: 22, },
 			anchor: { x: 11, y: 11 },
 		},
@@ -72,6 +184,12 @@ const route_types = {
 		},
 	},
 };
+route_types['0'] = route_types['901']; // Light Rail
+route_types['1'] = route_types['401']; // Metro
+route_types['3'] = route_types['704']; // Bus
+route_types['4'] = route_types['1200']; // Ferry
+route_types['6'] = route_types['1300']; // Aerial Lift
+route_types['7'] = route_types['1400']; // Funicular
 
 // TODO: Place DOM and Maps manipulation here
 // TODO: Place Data manipulation in Worker
@@ -94,8 +212,7 @@ class GTFS extends Worker {
 		const intRouteType = Number.parseInt(route_type);
 		const options = (() => {
 			if (typeof route_types[route_type] === 'object'
-				&& route_types[route_type] !== null
-				&& Number.isFinite(route_types[route_type])) {
+				&& route_types[route_type] !== null) {
 				return route_types[route_type];
 			}
 			// if (route_type !== '3') console.log('Sam, getPinForType, route_type:', route_type);
@@ -154,7 +271,7 @@ class GTFS extends Worker {
 			switch (intRouteType) {
 				case 107: // Tourist Rail
 					return route_types.rail.minZoom + 1;
-				case 107: // Shuttle Rail
+				case 108: // Shuttle Rail
 					return route_types.bus.minZoom;
 			}
 			switch (Math.floor(intRouteType / 100)) {
@@ -222,13 +339,14 @@ class GTFS extends Worker {
 			section.setAttribute('data-route-type', route.route_type);
 			section.setAttribute('data-route-short-name', route.route_short_name);
 			main.appendChild(section);
+			const x_route_icon = route_types[route.route_type] && route_types[route.route_type].x_route_icon || route.x_route_icon;
 
 			// Add Route Section Headers
 			if (route.route_short_name) {
-				section.insertAdjacentHTML('beforeend', `<h1 style="background:#${route.route_color || 'ffffff'};color:#${route.route_text_color || '000000'}">&#x${route.x_route_icon};&#xfe0f; ${route.route_short_name}`);
-				section.insertAdjacentHTML('beforeend', `<h2 style="background:#${route.route_color || 'ffffff'};color:#${route.route_text_color || '000000'}">&#x${route.x_route_icon};&#xfe0e; ${route.route_long_name}`);
+				section.insertAdjacentHTML('beforeend', `<h1 style="background:#${route.route_color || 'ffffff'};color:#${route.route_text_color || '000000'}">&#x${x_route_icon};&#xfe0f; ${route.route_short_name}`);
+				section.insertAdjacentHTML('beforeend', `<h2 style="background:#${route.route_color || 'ffffff'};color:#${route.route_text_color || '000000'}">&#x${x_route_icon};&#xfe0e; ${route.route_long_name}`);
 			} else {
-				section.insertAdjacentHTML('beforeend', `<h1 style="background:#${route.route_color || 'ffffff'};color:#${route.route_text_color || '000000'}">&#x${route.x_route_icon};&#xfe0f; ${route.route_long_name} &#x${route.x_route_icon};&#xfe0e;`);
+				section.insertAdjacentHTML('beforeend', `<h1 style="background:#${route.route_color || 'ffffff'};color:#${route.route_text_color || '000000'}">&#x${x_route_icon};&#xfe0f; ${route.route_long_name} &#x${x_route_icon};&#xfe0e;`);
 			}
 			if (typeof route.route_desc === 'string' && route.route_desc !== '') {
 				section.insertAdjacentHTML('beforeend', `<div>${route.route_desc}`);
@@ -371,6 +489,7 @@ class GTFS extends Worker {
 			if (typeof this.polylines !== 'object' || this.polylines === null) return;
 			const routeTypeMap = new Map([
 				[1, 'rail'],
+				[9, 'rail'],
 				[7, 'bus'],
 			]);
 
@@ -479,55 +598,58 @@ class GTFS extends Worker {
 
 	// Add Stops to Routes and Map
 	listStops(routes) {
-		Object.entries(routes).forEach(([route_id, stops]) => {
+		routes.forEach((route, route_id) => {
 			let section = document.querySelector(`section[data-route-id="${route_id}"]`);
 			if (!(section instanceof Element)) {
 				console.error('Sam, route', route_id, 'not set?!');
 				return;
 			}
-			if (!Array.isArray(stops) || stops.length === 0) {
-				// Nothing to list, just move on
-				return;
-			}
-			[...section.querySelectorAll('ol')].forEach(list => list.remove());
-			if (typeof this.stops[route_id] !== 'object' || this.stops[route_id] === null) {
-				this.stops[route_id] = {};
-			}
-			const list = document.createElement('ol');
-			const route_type = section.getAttribute('data-route-type');
-			stops.forEach((stop) => {
-				const li = document.createElement('li');
-				let title = stop.stop_name;
-				if (typeof stop.stop_code === 'string' && stop.stop_code !== '') {
-					title = `${stop.stop_code}. ${stop.stop_name}`;
-					if (Number.isFinite(Number.parseInt(stop.stop_code))) {
-						// li.setAttribute('value', stop.stop_code);
-						// li.innerHTML = stop.stop_name;
-					} else {
-					}
+			route.forEach((stops, destination_id) => {
+				// console.log('Sam, listStops:', route_id, stops);
+				if (!Array.isArray(stops) || stops.length === 0) {
+					// Nothing to list, just move on
+					return;
+				}
+				[...section.querySelectorAll('ol')].forEach(list => list.remove());
+				if (typeof this.stops[route_id] !== 'object' || this.stops[route_id] === null) {
+					this.stops[route_id] = {};
+				}
+				const list = document.createElement('ol');
+				const route_type = section.getAttribute('data-route-type');
+				stops.forEach((stop) => {
+					const li = document.createElement('li');
+					let title = stop.stop_name;
+					if (typeof stop.stop_code === 'string' && stop.stop_code !== '') {
+						title = `${stop.stop_code}. ${stop.stop_name}`;
+						if (Number.isFinite(Number.parseInt(stop.stop_code))) {
+							// li.setAttribute('value', stop.stop_code);
+							// li.innerHTML = stop.stop_name;
+						} else {
+						}
 						li.innerHTML = `${stop.stop_name} (${stop.stop_code})`;
-				} else {
-					li.innerHTML = stop.stop_name;
-				}
-				list.appendChild(li);
-				if (!(this.stops[route_id][stop.stop_id] instanceof google.maps.Marker)) {
-					this.stops[route_id][stop.stop_id] = new google.maps.Marker({
-						...this.getStopOptionsForRouteType(route_type),
-						position: {
-							lat: Number.parseFloat(stop.stop_lat),
-							lng: Number.parseFloat(stop.stop_lon),
-						},
-						visible: false,
-						map: this.map,
-						title,
-					});
-					// TODO: Add info windows
-				}
-				this.stops[route_id][stop.stop_id].route_type = route_type;
+					} else {
+						li.innerHTML = stop.stop_name;
+					}
+					list.appendChild(li);
+					if (!(this.stops[route_id][stop.stop_id] instanceof google.maps.Marker)) {
+						this.stops[route_id][stop.stop_id] = new google.maps.Marker({
+							...this.getStopOptionsForRouteType(route_type),
+							position: {
+								lat: Number.parseFloat(stop.stop_lat),
+								lng: Number.parseFloat(stop.stop_lon),
+							},
+							visible: false,
+							map: this.map,
+							title,
+						});
+						// TODO: Add info windows
+					}
+					this.stops[route_id][stop.stop_id].route_type = route_type;
+				});
+				section.appendChild(list);
+				// Set max-height on list
+				list.setAttribute('data-max-height', list.offsetHeight);
 			});
-			section.appendChild(list);
-			// Set max-height on list
-			list.setAttribute('data-max-height', list.offsetHeight);
 		});
 	}
 };
