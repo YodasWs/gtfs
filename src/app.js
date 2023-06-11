@@ -12,7 +12,28 @@ function showNoWorkerError() {
 		div.removeAttribute('hidden');
 	});
 }
-
+const zoomAdjust = {
+	opacity: {
+		rail: 1,
+		tram: 1,
+		bus: 1,
+		etc: 1,
+	},
+	weight: {
+		rail: (zoom) => {
+			if (zoom >= 14) return zoom - 12;
+			if (zoom >= 12) return 2;
+			if (zoom >= 10) return 1;
+			return 0;
+		},
+		bus: (zoom) => {
+			if (zoom >= 16) return zoom - 14;
+			if (zoom >= 14) return zoom - 13;
+			return 0;
+		},
+		etc: () => 0,
+	},
+};
 const route_types = {
 	tram: { // Tram, Streetcar, Light Rail
 		minZoom: 10,
@@ -202,6 +223,7 @@ class GTFS extends Worker {
 			section.setAttribute('data-route-short-name', route.route_short_name);
 			main.appendChild(section);
 
+			// Add Route Section Headers
 			if (route.route_short_name) {
 				section.insertAdjacentHTML('beforeend', `<h1 style="background:#${route.route_color || 'ffffff'};color:#${route.route_text_color || '000000'}">&#x${route.x_route_icon};&#xfe0f; ${route.route_short_name}`);
 				section.insertAdjacentHTML('beforeend', `<h2 style="background:#${route.route_color || 'ffffff'};color:#${route.route_text_color || '000000'}">&#x${route.x_route_icon};&#xfe0e; ${route.route_long_name}`);
@@ -347,18 +369,6 @@ class GTFS extends Worker {
 		// (Because thick lines are good for Hakone and Charlotte, but not densely-packed New York City)
 		(() => {
 			if (typeof this.polylines !== 'object' || this.polylines === null) return;
-			const adjust = {
-				opacity: {
-					rail: 1,
-					bus: 1,
-					etc: 1,
-				},
-				weight: {
-					rail: 0,
-					bus: 0,
-					etc: 0,
-				},
-			};
 			const routeTypeMap = new Map([
 				[1, 'rail'],
 				[7, 'bus'],
@@ -366,19 +376,8 @@ class GTFS extends Worker {
 
 			// Make Lines Thicker for Easier Reading
 			let opacityAdjust = 1;
-			if (this.map.zoom >= 10) {
-				adjust.weight.rail = 1;
-			}
-			if (this.map.zoom >= 12) {
-				adjust.weight.rail = 2;
-			}
 			if (this.map.zoom >= 14) {
 				opacityAdjust = 1.5;
-				adjust.weight.bus = this.map.zoom - 13;
-				adjust.weight.rail = this.map.zoom - 12;
-			}
-			if (this.map.zoom >= 16) {
-				adjust.weight.bus = this.map.zoom - 14;
 			}
 			Object.entries(
 				typeof shape === 'object' && shape !== null ? {
@@ -400,7 +399,7 @@ class GTFS extends Worker {
 					}
 					this.polylines[shape.shape_id].setOptions({
 						strokeOpacity: shape.opacity * opacityAdjust,
-						strokeWeight: shape.weight + adjust.weight[route_type],
+						strokeWeight: shape.weight + zoomAdjust.weight[route_type](this.map.zoom),
 					});
 				}
 			});
