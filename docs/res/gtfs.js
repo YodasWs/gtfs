@@ -242,14 +242,14 @@ globalThis.gtfs = {
 						case '5': // Cable Car
 							route.x_route_icon = '1f683';
 							break;
+						case '800': // Trolleybus
 						case '11': // Trolleybus
 							route.x_route_icon = '1f68e';
 							break;
+						case '405': // Monorail
 						case '12': // Monorail
 							route.x_route_icon = '1f69d';
 							break;
-						default:
-							route.x_route_icon = '1f68d';
 					}
 				}
 				this.updateRoute(route.route_id, route);

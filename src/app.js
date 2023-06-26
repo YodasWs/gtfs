@@ -47,7 +47,7 @@ const zoomAdjust = {
 
 const route_types = {
 	'107': { // Tourist Railway
-		x_route_icon: '1f688',
+		x_route_icon: '1f69e',
 		minZoom: 12,
 		zIndex: 95,
 		icon: {
@@ -348,7 +348,9 @@ class GTFS extends Worker {
 			section.setAttribute('data-route-type', route.route_type);
 			section.setAttribute('data-route-short-name', route.route_short_name);
 			main.appendChild(section);
-			const x_route_icon = route_types[route.route_type] && route_types[route.route_type].x_route_icon || route.x_route_icon;
+			const x_route_icon = route.x_route_icon
+				|| route_types[route.route_type] && route_types[route.route_type].x_route_icon
+				|| '1f68d'; // Default: bus
 
 			// Add Route Section Headers
 			if (route.route_short_name) {
@@ -592,6 +594,7 @@ class GTFS extends Worker {
 				case '1400': // Funicular
 				case '7': // Funicular
 					return 7;
+				case '405': // Monorail
 				case '12': // Monorail
 					return 9;
 			}
