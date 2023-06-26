@@ -13,6 +13,15 @@ function showNoWorkerError() {
 	});
 }
 
+function showSelector(selector) {
+	[...document.querySelectorAll('#google-maps')].forEach((el) => {
+		el.setAttribute('hidden', 'hidden');
+	});
+	[...document.querySelectorAll(selector)].forEach((div) => {
+		div.removeAttribute('hidden');
+	});
+}
+
 const zoomAdjust = {
 	opacity: {
 		rail: 1,
@@ -653,10 +662,68 @@ class GTFS extends Worker {
 		});
 	}
 };
+let gtfs;
+
+const locs = {
+	'jp/hakone': {
+		search: 'Hakone, Japan',
+		title: 'Hakone, Japan',
+		files: [
+			'jp/hakone',
+		],
+	},
+	'us/charlotte': {
+		search: 'Charlotte, NC, USA',
+		title: 'Charlotte',
+		files: [
+			'us/charlotte',
+		],
+	},
+	'us/new-york': {
+		search: 'New York City',
+		title: 'New York City',
+		files: [
+			'us/nyc-bx-bus',
+			'us/nyc-si-bus',
+			'us/nyc-subway',
+			'us/nyc-b-bus',
+			'us/nyc-m-bus',
+			'us/nyc-q-bus',
+			'us/nyc-lirr',
+			'us/nyc-path',
+		],
+	},
+};
 
 yodasws.page('home').setRoute({
 	template: 'pages/home.html',
-	route: '/([a-z]{2}/([\\w-]+/)?)?',
+	route: '/?',
+}).on('load', () => {
+	if (gtfs instanceof Worker) {
+		gtfs.terminate();
+	}
+	// Show list of Locations
+	const ul = document.querySelector('ul.home-page');
+	if (ul instanceof Element) {
+		Object.entries(locs).sort((a, b) => {
+			if (a[1].title.toLowerCase() < b[1].title.toLowerCase()) return -1;
+			if (b[1].title.toLowerCase() < a[1].title.toLowerCase()) return 1;
+			return 0;
+		}).forEach(([key, obj]) => {
+			const li = document.createElement('li');
+			const a = document.createElement('a');
+			a.innerHTML = obj.title;
+			a.setAttribute('href', `#!/${key}/`);
+			li.appendChild(a);
+			ul.appendChild(li);
+		});
+		showSelector('.home-page');
+	}
+});
+
+yodasws.page('map').setRoute({
+	template: 'pages/map.html',
+	route: '/[a-z]{2}/([\\w-]+/?)',
 }).on('load', () => {
 	// Require Web Workers
 	if (!window.Worker) {
@@ -665,7 +732,10 @@ yodasws.page('home').setRoute({
 	}
 
 	// Start loading GTFS files
-	const gtfs = new GTFS('res/gtfs.js');
+	if (gtfs instanceof Worker) {
+		gtfs.terminate();
+	}
+	gtfs = new GTFS('res/gtfs.js');
 	if (!(gtfs instanceof Worker)) {
 		showNoWorkerError();
 		return;
@@ -680,41 +750,10 @@ yodasws.page('home').setRoute({
 	// Get basic information about location
 	const loc = (() => {
 		const loc = window.location.hash.replace(/^#!\/|\/$/g, '');
-		let locs = {
-			'jp/hakone': {
-				search: 'Hakone, Japan',
-				title: 'Hakone, Japan',
-				files: [
-					'jp/hakone',
-				],
-			},
-			'us/charlotte': {
-				search: 'Charlotte, NC, USA',
-				title: 'Charlotte',
-				files: [
-					'us/charlotte',
-				],
-			},
-			'us/new-york': {
-				search: 'New York City',
-				title: 'New York City',
-				files: [
-					'us/nyc-bx-bus',
-					'us/nyc-si-bus',
-					'us/nyc-subway',
-					'us/nyc-b-bus',
-					'us/nyc-m-bus',
-					'us/nyc-q-bus',
-					'us/nyc-lirr',
-					'us/nyc-path',
-				],
-			},
-		};
 		if (locs[loc]) {
 			return locs[loc];
 		}
-		locs = Object.entries(locs).filter(([key, obj]) => key.includes(loc));
-		return locs[Math.floor(Math.random() * locs.length)][1];
+		return false;
 	})();
 	if (!loc) {
 		showNoGoogleError();

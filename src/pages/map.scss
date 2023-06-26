@@ -1,0 +1,176 @@
+$col1: "screen";
+$col2: "(min-width: 500px)";
+$col3: "(min-width: 800px)";
+$col4: "(min-width: 1000px)";
+
+[y-page="map"] {
+	display: flex;
+	flex-flow: column nowrap;
+	align-items: stretch;
+	$gap: 1rem;
+	gap: $gap;
+
+	> h2 {
+		flex-basis: 100%;
+		line-height: 150%;
+		margin-bottom: 0.5rem;
+	}
+
+	$box-border: 1px solid black;
+
+	%box {
+		flex-basis: 100%;
+		border: $box-border;
+		flex-grow: 1;
+
+		> h1,
+		> h2 {
+			text-align: center;
+			margin: -1px -1px 0;
+			border-right: $box-border;
+			border-left: $box-border;
+
+			&:first-child {
+				border-top: $box-border;
+			}
+		}
+
+		> h1 {
+			font-size: 1.5em;
+			padding: 2px 5px;
+
+			&:only-of-type {
+				text-align: center;
+			}
+
+			&:nth-of-type(n + 2) {
+				margin-top: 1rem;
+			}
+		}
+
+		> h2 {
+			font-size: 1.2em;
+			padding: 0 5px 5px;
+		}
+	}
+
+	> #google-maps:not([hidden]) {
+		min-height: 400px;
+		flex-basis: 100%;
+		align-self: stretch;
+		order: 1;
+	}
+
+	> form {
+		@extend %box;
+		padding: 0.4rem;
+		order: 2;
+	}
+
+	> section {
+		@extend %box;
+		padding: 2px 1rem 1rem;
+
+		> div {
+			padding: 2px 5px;
+		}
+	}
+
+	> section.agency {
+		order: 10;
+
+		> * {
+			display: block;
+		}
+
+		> h1 {
+			margin: 0.5rem 0;
+			border: 0 none;
+
+			&:nth-of-type(n + 2) {
+				margin-top: 1rem;
+			}
+		}
+
+		> a[href] {
+			font-size: smaller;
+
+			&:only-of-type {
+				text-align: center;
+			}
+		}
+	}
+
+	> section[data-route-id] {
+		display: flex;
+		flex-flow: column nowrap;
+
+		padding: 0;
+		order: 3;
+
+		> h1,
+		> h2 {
+			cursor: pointer;
+		}
+
+		&.highlighted {
+			order: 2;
+		}
+
+		> ol[data-max-height] {
+			max-height: 0;
+			overflow: hidden;
+			transition: max-height 1s;
+		}
+
+		&.highlighted > ol[data-max-height] {
+			max-height: attr(data-max-height px);
+		}
+	}
+
+	> .error {
+		@extend %box;
+		flex-basis: 100%;
+		order: 900;
+		border: 3px solid red;
+		padding: 0.6rem 1rem;
+	}
+
+	> footer {
+		flex-basis: 100%;
+		font-size: 0.8em;
+		order: 1000;
+
+		> p:first-child {
+			margin-top: 0;
+		}
+	}
+
+	@media #{$col2} {
+		display: flex;
+		flex-flow: row wrap;
+		align-items: flex-start;
+
+		%box {
+			flex-basis: calc((100% - 1 * #{$gap}) / 2);
+		}
+	}
+
+	@media #{$col3} {
+		justify-content: space-between;
+
+		> #google-maps:not([hidden]) {
+			flex-basis: 70%;
+		}
+
+		%box {
+			flex-basis: calc((100% - 2 * #{$gap}) / 3);
+		}
+	}
+
+	@media #{$col4} {
+		%box {
+			flex-basis: calc((100% - 3 * #{$gap}) / 4);
+		}
+	}
+}
